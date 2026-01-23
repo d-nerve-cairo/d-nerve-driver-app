@@ -22,8 +22,8 @@ public class HomeFragment extends Fragment {
 
         Button btnStartTrip = view.findViewById(R.id.btn_start_trip);
         btnStartTrip.setOnClickListener(v -> {
-            // TODO: Launch TripActivity
-            Toast.makeText(getContext(), "Starting trip...", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(getActivity(), TripActivity.class);
+            startActivity(intent);
         });
 
         return view;
