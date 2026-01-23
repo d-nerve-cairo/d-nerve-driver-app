@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- D-Nerve Driver App - colors.xml -->
+<!-- Location: app/src/main/res/values/colors.xml -->
+<resources>
+    <!-- Primary -->
+    <color name="primary">#1E88E5</color>
+    <color name="primary_dark">#1565C0</color>
+    <color name="primary_light">#64B5F6</color>
+    
+    <!-- Accent (Orange for Driver App) -->
+    <color name="accent">#FF9800</color>
+    <color name="accent_dark">#F57C00</color>
+    
+    <!-- Status Colors -->
+    <color name="success">#4CAF50</color>
+    <color name="warning">#FFC107</color>
+    <color name="error">#F44336</color>
+    
+    <!-- Neutrals -->
+    <color name="background">#FAFAFA</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_hint">#9E9E9E</color>
+    <color name="divider">#BDBDBD</color>
+    <color name="disabled">#9E9E9E</color>
+    
+    <!-- Tier Colors (Gamification) -->
+    <color name="tier_bronze">#CD7F32</color>
+    <color name="tier_silver">#C0C0C0</color>
+    <color name="tier_gold">#FFD700</color>
+    <color name="tier_platinum">#E5E4E2</color>
+    
+    <!-- Tier Backgrounds -->
+    <color name="tier_bronze_bg">#FFF3E0</color>
+    <color name="tier_silver_bg">#F5F5F5</color>
+    <color name="tier_gold_bg">#FFFDE7</color>
+    <color name="tier_platinum_bg">#ECEFF1</color>
+    
+    <!-- Map Colors -->
+    <color name="route_line">#1E88E5</color>
+    <color name="route_line_alt">#64B5F6</color>
+    <color name="marker_start">#4CAF50</color>
+    <color name="marker_end">#F44336</color>
+    <color name="marker_current">#2196F3</color>
+    
+    <!-- Trip Status -->
+    <color name="trip_active">#4CAF50</color>
+    <color name="trip_paused">#FF9800</color>
+    <color name="trip_ended">#9E9E9E</color>
+    
+    <!-- Quality Score Colors -->
+    <color name="quality_excellent">#4CAF50</color>
+    <color name="quality_good">#8BC34A</color>
+    <color name="quality_fair">#FFC107</color>
+    <color name="quality_poor">#F44336</color>
+    
+    <!-- Bottom Navigation -->
+    <color name="bottom_nav_active">#1E88E5</color>
+    <color name="bottom_nav_inactive">#757575</color>
+    
+    <!-- Ripple -->
+    <color name="ripple_primary">#331E88E5</color>
+    <color name="ripple_accent">#33FF9800</color>
+</resources>

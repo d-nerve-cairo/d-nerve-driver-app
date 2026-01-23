@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- D-Nerve Driver App - splash_background.xml -->
+<!-- Location: app/src/main/res/drawable/splash_background.xml -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background color -->
+    <item android:drawable="@color/primary"/>
+    
+    <!-- Centered logo -->
+    <item
+        android:drawable="@drawable/ic_launcher_foreground"
+        android:gravity="center"/>
+</layer-list>

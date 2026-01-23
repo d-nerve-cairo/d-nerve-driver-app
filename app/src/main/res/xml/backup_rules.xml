@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- D-Nerve Driver App - backup_rules.xml -->
+<!-- Location: app/src/main/res/xml/backup_rules.xml -->
+<full-backup-content>
+    <!-- Exclude sensitive data -->
+    <exclude domain="sharedpref" path="auth_prefs.xml"/>
+</full-backup-content>
