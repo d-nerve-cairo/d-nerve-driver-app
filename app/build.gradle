@@ -18,6 +18,10 @@ android {
         versionCode 1
         versionName "1.0.0"
 
+        def properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        manifestPlaceholders = [MAPS_API_KEY: properties.getProperty('MAPS_API_KEY', '')]
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -35,6 +39,7 @@ android {
 
     buildFeatures {
         viewBinding true
+        buildConfig true
     }
 }
 
@@ -46,6 +51,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-livedata:2.7.0'
     implementation 'androidx.activity:activity:1.8.2'
     implementation 'androidx.fragment:fragment:1.6.2'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
     // Material Design
     implementation 'com.google.android.material:material:1.11.0'

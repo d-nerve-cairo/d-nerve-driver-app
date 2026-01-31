@@ -1,11 +1,21 @@
 package com.example.dnervecairo.models;
 
-public class LeaderboardEntry {
-    private final int rank;
-    private final String driverName;
-    private final String tier;
-    private final int points;
+import com.google.gson.annotations.SerializedName;
 
+public class LeaderboardEntry {
+    @SerializedName("rank")
+    private int rank;
+
+    @SerializedName("driver_name")
+    private String driverName;
+
+    @SerializedName("tier")
+    private String tier;
+
+    @SerializedName("points")
+    private int points;
+
+    // Constructor for local use
     public LeaderboardEntry(int rank, String driverName, String tier, int points) {
         this.rank = rank;
         this.driverName = driverName;
@@ -13,6 +23,7 @@ public class LeaderboardEntry {
         this.points = points;
     }
 
+    // Getters
     public int getRank() { return rank; }
     public String getDriverName() { return driverName; }
     public String getTier() { return tier; }

@@ -163,6 +163,19 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Edit Profile Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_edit_profile"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="8dp"
+            android:text="Edit Profile"
+            app:icon="@drawable/ic_edit"
+            app:iconGravity="textStart"
+            app:strokeColor="@color/primary"
+            android:textColor="@color/primary"/>
+
         <!-- Personal Info Card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"

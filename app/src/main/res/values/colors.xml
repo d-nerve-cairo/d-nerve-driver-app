@@ -24,6 +24,7 @@
     <color name="text_hint">#9E9E9E</color>
     <color name="divider">#BDBDBD</color>
     <color name="disabled">#9E9E9E</color>
+    <color name="white">#FFFFFF</color>
     
     <!-- Tier Colors (Gamification) -->
     <color name="tier_bronze">#CD7F32</color>

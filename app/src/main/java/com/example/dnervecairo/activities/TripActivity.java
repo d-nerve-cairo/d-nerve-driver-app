@@ -30,6 +30,16 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.button.MaterialButton;
 import android.content.Intent;
 
+import com.example.dnervecairo.api.ApiClient;
+import com.example.dnervecairo.api.requests.TripSubmission;
+import com.example.dnervecairo.api.requests.GpsPointRequest;
+import com.example.dnervecairo.api.responses.TripResponse;
+import com.example.dnervecairo.utils.PreferenceManager;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -235,13 +245,68 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
         long duration = System.currentTimeMillis() - startTime;
         int minutes = (int) (duration / (1000 * 60));
 
-        // Launch Trip Summary
+        // Submit trip to API
+        submitTripToApi(minutes);
+    }
+
+    private void submitTripToApi(int durationMinutes) {
+        PreferenceManager prefManager = new PreferenceManager(this);
+
+        // Check if logged in
+        if (!prefManager.isLoggedIn()) {
+            openTripSummary(durationMinutes);
+            return;
+        }
+
+        // Convert LatLng list to GpsPointRequest list
+        List<GpsPointRequest> gpsPointsList = new ArrayList<>();
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault());
+        sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+
+        for (LatLng point : tripPoints) {
+            gpsPointsList.add(new GpsPointRequest(
+                    point.latitude,
+                    point.longitude,
+                    sdf.format(new java.util.Date()),
+                    10.0f
+            ));
+        }
+
+        // Calculate start and end times
+        String endTime = sdf.format(new java.util.Date());
+        String startTimeStr = sdf.format(new java.util.Date(startTime));
+
+        TripSubmission request = new TripSubmission(
+                prefManager.getDriverId(),
+                startTimeStr,
+                endTime,
+                gpsPointsList
+        );
+
+        ApiClient.getInstance().getApiService()
+                .submitTrip(request)
+                .enqueue(new Callback<TripResponse>() {
+                    @Override
+                    public void onResponse(@NonNull Call<TripResponse> call, @NonNull Response<TripResponse> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            Toast.makeText(TripActivity.this, "Trip saved! +" + response.body().getPointsEarned() + " points", Toast.LENGTH_SHORT).show();
+                        }
+                        openTripSummary(durationMinutes);
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<TripResponse> call, @NonNull Throwable t) {
+                        Toast.makeText(TripActivity.this, "Trip saved locally", Toast.LENGTH_SHORT).show();
+                        openTripSummary(durationMinutes);
+                    }
+                });
+    }
+    private void openTripSummary(int durationMinutes) {
         Intent intent = new Intent(this, TripSummaryActivity.class);
-        intent.putExtra(TripSummaryActivity.EXTRA_DURATION, minutes);
+        intent.putExtra(TripSummaryActivity.EXTRA_DURATION, durationMinutes);
         intent.putExtra(TripSummaryActivity.EXTRA_DISTANCE, totalDistance);
         intent.putExtra(TripSummaryActivity.EXTRA_GPS_POINTS, tripPoints.size());
         startActivity(intent);
-
         finish();
     }
 

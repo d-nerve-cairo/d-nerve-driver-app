@@ -28,24 +28,33 @@
         <!-- Google Maps API Key -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AQ.Ab8RN6JIxH_rrE_uvligsjY3U7wVLGlCasyDBiGAU8FjD-CKHg"/>
+            android:value="${MAPS_API_KEY}"/>
 
-        <!-- Main Activity (Launcher) -->
+
         <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:launchMode="singleTop">
+            android:name=".activities.TripHistoryActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity"/>
+
+
+        <!-- Login Activity (NEW LAUNCHER) -->
+        <activity
+            android:name=".activities.LoginActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
+        <!-- Main Activity-->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:launchMode="singleTop"/>
+
         <!-- Splash Activity -->
         <activity android:name=".activities.SplashActivity" android:exported="false"/>
-
-        <!-- Login Activity -->
-        <activity android:name=".activities.LoginActivity" android:exported="false"/>
 
         <!-- Register Activity -->
         <activity android:name=".activities.RegisterActivity" android:exported="false"/>
@@ -63,11 +72,25 @@
         <!-- Settings Activity -->
         <activity android:name=".activities.SettingsActivity" android:exported="false"/>
 
+        <!-- Edit Profile Activity -->
+        <activity
+            android:name=".activities.EditProfileActivity"
+            android:parentActivityName=".MainActivity"
+            android:exported="false" />
+
+        <!-- Rewards Activity -->
+
+        <activity
+            android:name=".activities.RewardsActivity"
+            android:parentActivityName=".MainActivity"
+            android:exported="false" />
+
         <!-- GPS Tracking Service -->
         <service
             android:name=".services.GpsTrackingService"
             android:exported="false"
             android:foregroundServiceType="location"/>
+
 
     </application>
 </manifest>

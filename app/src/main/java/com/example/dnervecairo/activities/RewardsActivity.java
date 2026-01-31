@@ -1,19 +1,18 @@
-package com.example.dnervecairo.fragments;
+package com.example.dnervecairo.activities;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,28 +21,27 @@ import com.example.dnervecairo.adapters.WithdrawalAdapter;
 import com.example.dnervecairo.api.ApiClient;
 import com.example.dnervecairo.api.requests.WithdrawalRequest;
 import com.example.dnervecairo.api.responses.DriverResponse;
-import com.example.dnervecairo.api.responses.WithdrawalHistoryResponse;
 import com.example.dnervecairo.api.responses.WithdrawalResponse;
 import com.example.dnervecairo.utils.PreferenceManager;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
-
+import com.example.dnervecairo.api.responses.WithdrawalHistoryResponse;
 import java.util.List;
+
 import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class RewardsFragment extends Fragment {
+public class RewardsActivity extends AppCompatActivity {
 
-    private static final double MIN_WITHDRAWAL = 5.0;
-
-    private TextView tvBalance, tvMinWithdrawal;
+    private TextView tvBalance, tvPointsInfo, tvTotalEarned, tvTotalWithdrawn;
     private MaterialButton btnWithdraw;
-    private RecyclerView rvHistory;
+    private RecyclerView rvWithdrawals;
     private LinearLayout emptyState;
-    private View loadingOverlay;
+    private FrameLayout loadingOverlay;
 
     private WithdrawalAdapter adapter;
     private PreferenceManager prefManager;
@@ -60,65 +58,51 @@ public class RewardsFragment extends Fragment {
             "Bank Transfer"
     };
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_rewards, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_rewards);
 
-        prefManager = new PreferenceManager(requireContext());
+        prefManager = new PreferenceManager(this);
         driverId = prefManager.getDriverId();
 
-        initViews(view);
+        initViews();
+        setupToolbar();
         setupRecyclerView();
-        setupWithdrawButton();
-
-        return view;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
+        setupButtons();
         loadRewardsData();
     }
 
-    private void initViews(View view) {
-        tvBalance = view.findViewById(R.id.tv_balance);
-        tvMinWithdrawal = view.findViewById(R.id.tv_min_withdrawal);
-        btnWithdraw = view.findViewById(R.id.btn_withdraw);
-        rvHistory = view.findViewById(R.id.rv_history);
-        emptyState = view.findViewById(R.id.empty_state);
-        loadingOverlay = view.findViewById(R.id.loading_overlay);
+    private void initViews() {
+        tvBalance = findViewById(R.id.tv_balance);
+        tvPointsInfo = findViewById(R.id.tv_points_info);
+        tvTotalEarned = findViewById(R.id.tv_total_earned);
+        tvTotalWithdrawn = findViewById(R.id.tv_total_withdrawn);
+        btnWithdraw = findViewById(R.id.btn_withdraw);
+        rvWithdrawals = findViewById(R.id.rv_withdrawals);
+        emptyState = findViewById(R.id.empty_state);
+        loadingOverlay = findViewById(R.id.loading_overlay);
+    }
 
-        // Update minimum withdrawal text
-        if (tvMinWithdrawal != null) {
-            tvMinWithdrawal.setText(String.format(Locale.US, "Minimum withdrawal: %.0f points", MIN_WITHDRAWAL * 10));
-        }
+    private void setupToolbar() {
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setNavigationOnClickListener(v -> finish());
     }
 
     private void setupRecyclerView() {
-        if (rvHistory != null) {
-            adapter = new WithdrawalAdapter();
-            rvHistory.setLayoutManager(new LinearLayoutManager(requireContext()));
-            rvHistory.setAdapter(adapter);
-        }
+        adapter = new WithdrawalAdapter();
+        rvWithdrawals.setLayoutManager(new LinearLayoutManager(this));
+        rvWithdrawals.setAdapter(adapter);
     }
 
-    private void setupWithdrawButton() {
-        btnWithdraw.setOnClickListener(v -> {
-            if (availableBalance >= MIN_WITHDRAWAL) {
-                showWithdrawDialog();
-            } else {
-                double needed = MIN_WITHDRAWAL - availableBalance;
-                Toast.makeText(getContext(),
-                        String.format(Locale.US, "Need %.2f more EGP to withdraw", needed),
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
+    private void setupButtons() {
+        btnWithdraw.setOnClickListener(v -> showWithdrawDialog());
     }
 
     private void loadRewardsData() {
         showLoading(true);
 
+        // Load driver data
         ApiClient.getInstance().getApiService()
                 .getDriver(driverId)
                 .enqueue(new Callback<DriverResponse>() {
@@ -130,6 +114,7 @@ public class RewardsFragment extends Fragment {
                         } else {
                             showToast("Failed to load rewards");
                         }
+                        // Load withdrawal history after driver data
                         loadWithdrawalHistory();
                     }
 
@@ -141,15 +126,6 @@ public class RewardsFragment extends Fragment {
                 });
     }
 
-    private void updateUI(DriverResponse driver) {
-        totalPoints = driver.getTotalPoints();
-        availableBalance = totalPoints / 10.0;
-
-        tvBalance.setText(String.valueOf(totalPoints));
-
-        // Enable/disable withdraw button
-        btnWithdraw.setEnabled(availableBalance >= MIN_WITHDRAWAL);
-    }
 
     private void loadWithdrawalHistory() {
         ApiClient.getInstance().getApiService()
@@ -162,13 +138,20 @@ public class RewardsFragment extends Fragment {
                         if (response.isSuccessful() && response.body() != null) {
                             List<WithdrawalResponse> withdrawals = response.body().getWithdrawals();
 
-                            if (withdrawals != null && !withdrawals.isEmpty() && adapter != null) {
+                            if (withdrawals != null && !withdrawals.isEmpty()) {
                                 adapter.setWithdrawals(withdrawals);
-                                if (rvHistory != null) rvHistory.setVisibility(View.VISIBLE);
-                                if (emptyState != null) emptyState.setVisibility(View.GONE);
+                                rvWithdrawals.setVisibility(View.VISIBLE);
+                                emptyState.setVisibility(View.GONE);
+
+                                // Calculate total withdrawn
+                                double totalWithdrawn = 0;
+                                for (WithdrawalResponse w : withdrawals) {
+                                    totalWithdrawn += w.getAmount();
+                                }
+                                tvTotalWithdrawn.setText(String.format(Locale.US, "%.2f", totalWithdrawn));
                             } else {
-                                if (rvHistory != null) rvHistory.setVisibility(View.GONE);
-                                if (emptyState != null) emptyState.setVisibility(View.VISIBLE);
+                                rvWithdrawals.setVisibility(View.GONE);
+                                emptyState.setVisibility(View.VISIBLE);
                             }
                         }
                     }
@@ -176,16 +159,44 @@ public class RewardsFragment extends Fragment {
                     @Override
                     public void onFailure(@NonNull Call<WithdrawalHistoryResponse> call, @NonNull Throwable t) {
                         showLoading(false);
-                        if (rvHistory != null) rvHistory.setVisibility(View.GONE);
-                        if (emptyState != null) emptyState.setVisibility(View.VISIBLE);
+                        // Silently fail - just show empty state
+                        rvWithdrawals.setVisibility(View.GONE);
+                        emptyState.setVisibility(View.VISIBLE);
                     }
                 });
     }
 
-    private void showWithdrawDialog() {
-        if (getContext() == null) return;
+    private void updateUI(DriverResponse driver) {
+        totalPoints = driver.getTotalPoints();
 
-        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_withdraw, null);
+        // Calculate rewards (10 points = 1 EGP)
+        double totalEarned = totalPoints / 10.0;
+
+        // For now, assume no withdrawals (would need API for history)
+        double totalWithdrawn = 0;
+        availableBalance = totalEarned - totalWithdrawn;
+
+        tvBalance.setText(String.format(Locale.US, "%.2f", availableBalance));
+        tvPointsInfo.setText(String.format(Locale.US, "%d points = %.2f EGP", totalPoints, totalEarned));
+        tvTotalEarned.setText(String.format(Locale.US, "%.2f", totalEarned));
+        tvTotalWithdrawn.setText(String.format(Locale.US, "%.2f", totalWithdrawn));
+
+        // Enable/disable withdraw button
+        btnWithdraw.setEnabled(availableBalance >= 5);
+        if (availableBalance < 5) {
+            btnWithdraw.setText("Min 5 EGP required");
+        } else {
+            btnWithdraw.setText("Withdraw");
+        }
+    }
+
+    private void showWithdrawDialog() {
+        if (availableBalance < 5) {
+            showToast("Minimum withdrawal is 5 EGP");
+            return;
+        }
+
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_withdraw, null);
 
         TextView tvAvailable = dialogView.findViewById(R.id.tv_available_balance);
         TextInputEditText etAmount = dialogView.findViewById(R.id.et_amount);
@@ -196,11 +207,12 @@ public class RewardsFragment extends Fragment {
 
         tvAvailable.setText(String.format(Locale.US, "Available: %.2f EGP", availableBalance));
 
+        // Setup payment method dropdown
         ArrayAdapter<String> methodAdapter = new ArrayAdapter<>(
-                requireContext(), android.R.layout.simple_dropdown_item_1line, paymentMethods);
+                this, android.R.layout.simple_dropdown_item_1line, paymentMethods);
         dropdownMethod.setAdapter(methodAdapter);
 
-        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+        AlertDialog dialog = new AlertDialog.Builder(this)
                 .setView(dialogView)
                 .create();
 
@@ -211,6 +223,7 @@ public class RewardsFragment extends Fragment {
             String method = dropdownMethod.getText().toString().trim();
             String account = etAccount.getText().toString().trim();
 
+            // Validation
             if (amountStr.isEmpty()) {
                 etAmount.setError("Enter amount");
                 return;
@@ -224,7 +237,7 @@ public class RewardsFragment extends Fragment {
                 return;
             }
 
-            if (amount < MIN_WITHDRAWAL) {
+            if (amount < 5) {
                 etAmount.setError("Minimum is 5 EGP");
                 return;
             }
@@ -265,7 +278,7 @@ public class RewardsFragment extends Fragment {
                         showLoading(false);
                         if (response.isSuccessful() && response.body() != null) {
                             showToast("Withdrawal request submitted!");
-                            loadRewardsData();
+                            loadRewardsData(); // Refresh data
                         } else {
                             showToast("Withdrawal failed. Try again.");
                         }
@@ -280,14 +293,10 @@ public class RewardsFragment extends Fragment {
     }
 
     private void showLoading(boolean show) {
-        if (loadingOverlay != null) {
-            loadingOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
-        }
+        loadingOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     private void showToast(String message) {
-        if (getContext() != null) {
-            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-        }
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }
