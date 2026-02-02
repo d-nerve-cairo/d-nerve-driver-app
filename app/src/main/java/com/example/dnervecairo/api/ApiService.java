@@ -13,6 +13,8 @@ import com.example.dnervecairo.api.responses.TripsListResponse;
 import com.example.dnervecairo.api.responses.WithdrawalResponse;
 import com.example.dnervecairo.api.requests.UpdateDriverRequest;
 import com.example.dnervecairo.api.responses.WithdrawalHistoryResponse;
+import com.example.dnervecairo.api.responses.BadgeResponse;
+import com.google.gson.JsonObject;
 import java.util.List;
 
 import retrofit2.Call;
@@ -95,4 +97,11 @@ public interface ApiService {
 
     @GET("health")
     Call<Object> healthCheck();
+
+    // ========== BADGES ==========
+    @GET("badges/driver/{driver_id}/progress")
+    Call<List<BadgeResponse>> getBadgeProgress(@Path("driver_id") String driverId);
+
+    @POST("badges/driver/{driver_id}/check")
+    Call<JsonObject> checkBadges(@Path("driver_id") String driverId);
 }

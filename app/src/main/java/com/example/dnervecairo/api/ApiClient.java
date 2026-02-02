@@ -11,7 +11,7 @@ public class ApiClient {
 
     // PC IP (from ipconfig)
     // For real phone: use your PC's IP
-    private static final String BASE_URL = "http://172.25.19.7:8000/api/v1/";
+    private static final String BASE_URL = "http://172.25.18.253:8000/api/v1/";
     // For emulator only:
     // private static final String BASE_URL = "http://10.0.2.2:8000/api/v1/";
 

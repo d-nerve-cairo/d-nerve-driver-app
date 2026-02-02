@@ -30,12 +30,11 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}"/>
 
-
+        <!-- Trip History Activity -->
         <activity
             android:name=".activities.TripHistoryActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity"/>
-
 
         <!-- Login Activity (NEW LAUNCHER) -->
         <activity
@@ -78,6 +77,12 @@
             android:parentActivityName=".MainActivity"
             android:exported="false" />
 
+        <!-- Badges -->
+        <activity
+            android:name=".activities.AchievementsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.DNerveDriver" />
+
         <!-- Rewards Activity -->
 
         <activity
@@ -93,4 +98,5 @@
 
 
     </application>
+
 </manifest>

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- D-Nerve Driver App - Arabic strings.xml -->
+<resources>
+    <!-- App Info -->
+    <string name="app_name">D-Nerve سائق</string>
+    <string name="app_tagline">قُد. اكسب. اربط القاهرة.</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">الرئيسية</string>
+    <string name="nav_leaderboard">المتصدرين</string>
+    <string name="nav_rewards">المكافآت</string>
+    <string name="nav_profile">الملف الشخصي</string>
+
+    <!-- Home Screen -->
+    <string name="home_welcome">مرحباً بعودتك!</string>
+    <string name="home_points_label">نقطة</string>
+    <string name="home_today_stats">إحصائيات اليوم</string>
+    <string name="home_quick_actions">إجراءات سريعة</string>
+    <string name="home_view_history">عرض السجل</string>
+    <string name="home_withdraw">سحب</string>
+
+    <!-- Trip Recording -->
+    <string name="trip_start">بدء الرحلة</string>
+    <string name="trip_stop">إنهاء الرحلة</string>
+    <string name="trip_active">رحلة نشطة</string>
+    <string name="trip_paused">رحلة متوقفة</string>
+    <string name="trip_duration">المدة</string>
+    <string name="trip_distance">المسافة</string>
+    <string name="trip_gps_points">نقاط GPS</string>
+    <string name="trip_quality">الجودة</string>
+    <string name="trip_gps_status">حالة GPS</string>
+    <string name="trip_gps_active">نشط</string>
+    <string name="trip_gps_weak">إشارة ضعيفة</string>
+    <string name="trip_gps_off">GPS مغلق</string>
+
+    <!-- Trip Summary -->
+    <string name="trip_complete">اكتملت الرحلة!</string>
+    <string name="trip_summary">ملخص الرحلة</string>
+    <string name="trip_points_earned">النقاط المكتسبة</string>
+    <string name="trip_details">تفاصيل الرحلة</string>
+    <string name="trip_points_breakdown">تفصيل النقاط</string>
+    <string name="trip_base_points">النقاط الأساسية</string>
+    <string name="trip_quality_bonus">مكافأة الجودة</string>
+    <string name="trip_peak_bonus">مكافأة ساعات الذروة</string>
+    <string name="trip_streak_bonus">مكافأة التتابع</string>
+    <string name="trip_total">المجموع</string>
+    <string name="trip_back_home">العودة للرئيسية</string>
+
+    <!-- Stats -->
+    <string name="stats_trips">الرحلات</string>
+    <string name="stats_quality">الجودة</string>
+    <string name="stats_streak">التتابع</string>
+    <string name="stats_day_streak">يوم متتابع</string>
+    <string name="stats_days_streak">أيام متتابعة</string>
+
+    <!-- Tiers -->
+    <string name="tier_bronze">برونزي</string>
+    <string name="tier_silver">فضي</string>
+    <string name="tier_gold">ذهبي</string>
+    <string name="tier_platinum">بلاتيني</string>
+    <string name="tier_progress">%1$d / %2$d نقطة للوصول إلى %3$s</string>
+    <string name="tier_driver">سائق %1$s</string>
+
+    <!-- Leaderboard -->
+    <string name="leaderboard_title">المتصدرين</string>
+    <string name="leaderboard_your_rank">ترتيبك</string>
+    <string name="leaderboard_top_drivers">أفضل السائقين</string>
+    <string name="leaderboard_this_week">هذا الأسبوع</string>
+    <string name="leaderboard_all_time">كل الأوقات</string>
+    <string name="leaderboard_by_points">بالنقاط</string>
+    <string name="leaderboard_by_quality">بالجودة</string>
+    <string name="leaderboard_by_trips">بالرحلات</string>
+
+    <!-- Rewards -->
+    <string name="rewards_title">المكافآت</string>
+    <string name="rewards_balance">الرصيد المتاح</string>
+    <string name="rewards_withdraw">سحب</string>
+    <string name="rewards_history">سجل المعاملات</string>
+    <string name="rewards_pending">قيد الانتظار</string>
+    <string name="rewards_completed">مكتمل</string>
+    <string name="rewards_min_withdrawal">الحد الأدنى للسحب: %1$d نقطة</string>
+
+    <!-- Profile -->
+    <string name="profile_title">الملف الشخصي</string>
+    <string name="profile_edit">تعديل الملف</string>
+    <string name="profile_personal_info">المعلومات الشخصية</string>
+    <string name="profile_vehicle_info">معلومات المركبة</string>
+    <string name="profile_trip_history">سجل الرحلات</string>
+    <string name="profile_settings">الإعدادات</string>
+    <string name="profile_logout">تسجيل الخروج</string>
+    <string name="profile_name">الاسم</string>
+    <string name="profile_phone">الهاتف</string>
+    <string name="profile_email">البريد الإلكتروني</string>
+    <string name="profile_vehicle_type">نوع المركبة</string>
+    <string name="profile_plate_number">رقم اللوحة</string>
+    <string name="profile_member_since">عضو منذ %1$s</string>
+
+    <!-- Auth -->
+    <string name="auth_login">تسجيل الدخول</string>
+    <string name="auth_register">إنشاء حساب</string>
+    <string name="auth_phone_number">رقم الهاتف</string>
+    <string name="auth_password">كلمة المرور</string>
+    <string name="auth_confirm_password">تأكيد كلمة المرور</string>
+    <string name="auth_forgot_password">نسيت كلمة المرور؟</string>
+    <string name="auth_no_account">ليس لديك حساب؟</string>
+    <string name="auth_has_account">لديك حساب بالفعل؟</string>
+    <string name="auth_sign_up">إنشاء حساب</string>
+    <string name="auth_sign_in">تسجيل الدخول</string>
+
+    <!-- Settings -->
+    <string name="settings_title">الإعدادات</string>
+    <string name="settings_notifications">الإشعارات</string>
+    <string name="settings_location">إعدادات الموقع</string>
+    <string name="settings_language">اللغة</string>
+    <string name="settings_about">حول التطبيق</string>
+    <string name="settings_privacy">سياسة الخصوصية</string>
+    <string name="settings_terms">شروط الخدمة</string>
+    <string name="settings_support">الدعم</string>
+    <string name="settings_version">الإصدار %1$s</string>
+
+    <!-- Permissions -->
+    <string name="permission_location_title">إذن الموقع مطلوب</string>
+    <string name="permission_location_message">يحتاج D-Nerve إلى الوصول للموقع لتتبع رحلاتك وحساب أرباحك.</string>
+    <string name="permission_location_background_title">الموقع في الخلفية</string>
+    <string name="permission_location_background_message">اسمح بالوصول للموقع طوال الوقت لتتبع الرحلات حتى عندما يكون التطبيق في الخلفية.</string>
+    <string name="permission_grant">منح الإذن</string>
+    <string name="permission_deny">رفض</string>
+
+    <!-- Errors -->
+    <string name="error_generic">حدث خطأ ما. يرجى المحاولة مرة أخرى.</string>
+    <string name="error_network">لا يوجد اتصال بالإنترنت. يرجى التحقق من الشبكة.</string>
+    <string name="error_location">تعذر الحصول على موقعك. يرجى تفعيل GPS.</string>
+    <string name="error_login">بيانات غير صحيحة. يرجى المحاولة مرة أخرى.</string>
+    <string name="error_empty_field">هذا الحقل مطلوب</string>
+    <string name="error_invalid_phone">يرجى إدخال رقم هاتف صحيح</string>
+    <string name="error_password_mismatch">كلمات المرور غير متطابقة</string>
+    <string name="error_password_weak">يجب أن تكون كلمة المرور 6 أحرف على الأقل</string>
+
+    <!-- Success Messages -->
+    <string name="success_trip_submitted">تم إرسال الرحلة بنجاح!</string>
+    <string name="success_profile_updated">تم تحديث الملف الشخصي بنجاح!</string>
+    <string name="success_withdrawal_requested">تم إرسال طلب السحب!</string>
+
+    <!-- Buttons -->
+    <string name="btn_ok">موافق</string>
+    <string name="btn_cancel">إلغاء</string>
+    <string name="btn_retry">إعادة المحاولة</string>
+    <string name="btn_save">حفظ</string>
+    <string name="btn_confirm">تأكيد</string>
+    <string name="btn_continue">متابعة</string>
+
+    <!-- Time Formats -->
+    <string name="time_format_hms">%1$02d:%2$02d:%3$02d</string>
+    <string name="time_format_ms">%1$02d:%2$02d</string>
+    <string name="time_minutes">%1$d دقيقة</string>
+    <string name="time_hours">%1$d ساعة</string>
+
+    <!-- Distance -->
+    <string name="distance_km">%1$.1f كم</string>
+    <string name="distance_m">%1$d م</string>
+
+    <!-- Quality Labels -->
+    <string name="quality_excellent">ممتاز</string>
+    <string name="quality_good">جيد</string>
+    <string name="quality_fair">مقبول</string>
+    <string name="quality_poor">ضعيف</string>
+
+    <!-- Empty States -->
+    <string name="empty_trips">لا توجد رحلات بعد</string>
+    <string name="empty_trips_hint">ابدأ رحلتك الأولى لتظهر هنا!</string>
+    <string name="empty_rewards">لا توجد معاملات بعد</string>
+    <string name="empty_leaderboard">لا توجد بيانات متاحة</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_trip">تتبع الرحلة</string>
+    <string name="notification_channel_trip_desc">يظهر عند تسجيل رحلة</string>
+    <string name="notification_trip_active">جاري تسجيل الرحلة…</string>
+    <string name="notification_trip_tap_stop">اضغط للإيقاف</string>
+</resources>

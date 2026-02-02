@@ -19,12 +19,12 @@ import com.example.dnervecairo.utils.PreferenceManager;
 import com.example.dnervecairo.utils.SettingsManager;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.switchmaterial.SwitchMaterial;
+import androidx.appcompat.app.AppCompatDelegate;
 
 public class SettingsActivity extends AppCompatActivity {
 
     private SettingsManager settingsManager;
     private PreferenceManager prefManager;
-
     private Spinner spinnerGpsAccuracy;
     private Spinner spinnerUpdateInterval;
     private SwitchMaterial switchNotifications;
@@ -32,21 +32,26 @@ public class SettingsActivity extends AppCompatActivity {
     private SwitchMaterial switchRewardAlerts;
     private SwitchMaterial switchAutoSync;
     private SwitchMaterial switchWifiOnly;
-
+    private SwitchMaterial switchDarkMode;
+    private Spinner spinnerLanguage;
     private boolean isInitializing = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Apply saved language BEFORE setContentView
+        settingsManager = new SettingsManager(this);
+        applyLanguage(settingsManager.getLanguage());
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        settingsManager = new SettingsManager(this);
         prefManager = new PreferenceManager(this);
 
         initViews();
         setupToolbar();
         setupSpinners();
         setupSwitches();
+        setupLanguageSpinner();
         setupButtons();
         loadSettings();
 
@@ -61,6 +66,8 @@ public class SettingsActivity extends AppCompatActivity {
         switchRewardAlerts = findViewById(R.id.switch_reward_alerts);
         switchAutoSync = findViewById(R.id.switch_auto_sync);
         switchWifiOnly = findViewById(R.id.switch_wifi_only);
+        switchDarkMode = findViewById(R.id.switch_dark_mode);
+        spinnerLanguage = findViewById(R.id.spinner_language);
 
         // Set app version
         TextView tvVersion = findViewById(R.id.tv_app_version);
@@ -148,6 +155,15 @@ public class SettingsActivity extends AppCompatActivity {
                 settingsManager.setWifiOnlyEnabled(isChecked);
             }
         });
+
+        switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (!isInitializing) {
+                settingsManager.setDarkModeEnabled(isChecked);
+                AppCompatDelegate.setDefaultNightMode(
+                        isChecked ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
+                );
+            }
+        });
     }
 
     private void setupButtons() {
@@ -194,6 +210,9 @@ public class SettingsActivity extends AppCompatActivity {
         switchAutoSync.setChecked(autoSyncEnabled);
         switchWifiOnly.setChecked(settingsManager.isWifiOnlyEnabled());
         switchWifiOnly.setEnabled(autoSyncEnabled);
+
+        // Dark Mode Settings
+        switchDarkMode.setChecked(settingsManager.isDarkModeEnabled());
     }
 
     private void openUrl(String url) {
@@ -230,5 +249,44 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    private void setupLanguageSpinner() {
+        String[] languages = {"English", "العربية"};
+        String[] languageCodes = {"en", "ar"};
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this, android.R.layout.simple_spinner_item, languages);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerLanguage.setAdapter(adapter);
+
+        // Set current selection
+        String currentLang = settingsManager.getLanguage();
+        spinnerLanguage.setSelection(currentLang.equals("ar") ? 1 : 0);
+
+        spinnerLanguage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (!isInitializing) {
+                    String selectedLang = languageCodes[position];
+                    if (!selectedLang.equals(settingsManager.getLanguage())) {
+                        settingsManager.setLanguage(selectedLang);
+                        applyLanguage(selectedLang);
+                        recreate(); // Restart activity to apply
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+    }
+
+    private void applyLanguage(String languageCode) {
+        java.util.Locale locale = new java.util.Locale(languageCode);
+        java.util.Locale.setDefault(locale);
+        android.content.res.Configuration config = new android.content.res.Configuration();
+        config.setLocale(locale);
+        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
     }
 }

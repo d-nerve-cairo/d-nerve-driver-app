@@ -20,6 +20,13 @@ public class SettingsManager {
     private static final String KEY_AUTO_SYNC = "auto_sync";
     private static final String KEY_WIFI_ONLY = "wifi_only";
 
+    // Appearance Settings
+    private static final String KEY_DARK_MODE = "dark_mode";
+
+    // Language Settings
+    private static final String KEY_LANGUAGE = "language";
+
+
     private final SharedPreferences prefs;
 
     public SettingsManager(Context context) {
@@ -84,6 +91,23 @@ public class SettingsManager {
 
     public void setWifiOnlyEnabled(boolean enabled) {
         prefs.edit().putBoolean(KEY_WIFI_ONLY, enabled).apply();
+    }
+
+    // Dark Mode
+    public boolean isDarkModeEnabled() {
+        return prefs.getBoolean(KEY_DARK_MODE, false);
+    }
+
+    public void setDarkModeEnabled(boolean enabled) {
+        prefs.edit().putBoolean(KEY_DARK_MODE, enabled).apply();
+    }
+
+    public String getLanguage() {
+        return prefs.getString(KEY_LANGUAGE, "en"); // Default: English
+    }
+
+    public void setLanguage(String languageCode) {
+        prefs.edit().putString(KEY_LANGUAGE, languageCode).apply();
     }
 
     // Clear all settings
