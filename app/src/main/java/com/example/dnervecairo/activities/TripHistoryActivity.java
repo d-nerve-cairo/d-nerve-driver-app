@@ -6,6 +6,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.Intent;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -91,9 +92,17 @@ public class TripHistoryActivity extends AppCompatActivity {
             }
         });
 
+        // Click listener - opens trip map
         adapter.setOnTripClickListener(trip -> {
-            // TODO: Open trip detail view
-            Toast.makeText(this, "Trip: " + trip.getTripId(), Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, TripMapActivity.class);
+            intent.putExtra(TripMapActivity.EXTRA_TRIP_ID, trip.getTripId());
+            intent.putExtra(TripMapActivity.EXTRA_GPS_POINTS, trip.getGpsPointsJson());
+            intent.putExtra(TripMapActivity.EXTRA_DURATION, (double) trip.getDurationMinutes());
+            intent.putExtra(TripMapActivity.EXTRA_DISTANCE, trip.getDistanceKm());
+            intent.putExtra(TripMapActivity.EXTRA_POINTS_EARNED, trip.getPointsEarned());
+            intent.putExtra(TripMapActivity.EXTRA_QUALITY, trip.getQualityScore());
+            intent.putExtra(TripMapActivity.EXTRA_DATE, trip.getStartTime());
+            startActivity(intent);
         });
     }
 

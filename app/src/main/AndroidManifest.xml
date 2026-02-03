@@ -96,6 +96,12 @@
             android:exported="false"
             android:foregroundServiceType="location"/>
 
+        <!-- Trip Map Activity -->
+        <activity
+            android:name=".activities.TripMapActivity"
+            android:exported="false"
+            android:theme="@style/Theme.DNerveDriver" />
+
 
     </application>
 

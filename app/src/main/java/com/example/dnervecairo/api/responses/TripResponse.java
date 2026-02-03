@@ -37,6 +37,9 @@ public class TripResponse {
     @SerializedName("created_at")
     private String createdAt;
 
+    @SerializedName("gps_points_json")
+    private String gpsPointsJson;
+
     // Getters
     public String getTripId() {
         return tripId;
@@ -86,5 +89,9 @@ public class TripResponse {
     public double getDistanceKm() {
         // Rough estimate: ~0.5km per minute of travel
         return durationMinutes * 0.5;
+    }
+
+    public String getGpsPointsJson() {
+        return gpsPointsJson;
     }
 }
