@@ -15,6 +15,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.example.dnervecairo.R;
+import com.example.dnervecairo.api.ApiClient;
+import com.example.dnervecairo.api.requests.TripSubmission;
+import com.example.dnervecairo.api.requests.GpsPointRequest;
+import com.example.dnervecairo.api.responses.TripResponse;
+import com.example.dnervecairo.utils.NetworkUtils;
+import com.example.dnervecairo.utils.OfflineManager;
+import com.example.dnervecairo.utils.PreferenceManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -28,13 +35,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.button.MaterialButton;
-import android.content.Intent;
 
-import com.example.dnervecairo.api.ApiClient;
-import com.example.dnervecairo.api.requests.TripSubmission;
-import com.example.dnervecairo.api.requests.GpsPointRequest;
-import com.example.dnervecairo.api.responses.TripResponse;
-import com.example.dnervecairo.utils.PreferenceManager;
+import android.content.Intent;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -50,6 +52,7 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     // UI Elements
     private TextView tvTimer, tvDistance, tvGpsPoints, tvGpsStatus;
+    private TextView tvOfflineIndicator;
     private ImageView ivGpsStatus;
     private MaterialButton btnStopTrip;
 
@@ -69,15 +72,22 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
     private final Handler timerHandler = new Handler(Looper.getMainLooper());
     private Runnable timerRunnable;
 
+    // Offline
+    private OfflineManager offlineManager;
+    private boolean isOffline = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip);
 
+        offlineManager = new OfflineManager(this);
+
         initViews();
         initMap();
         initLocationClient();
         setupStopButton();
+        checkNetworkStatus();
     }
 
     private void initViews() {
@@ -87,6 +97,44 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
         tvGpsStatus = findViewById(R.id.tv_gps_status);
         ivGpsStatus = findViewById(R.id.iv_gps_status);
         btnStopTrip = findViewById(R.id.btn_stop_trip);
+        tvOfflineIndicator = findViewById(R.id.tv_offline_indicator);
+    }
+
+    private void checkNetworkStatus() {
+        isOffline = !NetworkUtils.isNetworkAvailable(this);
+        updateOfflineIndicator();
+
+        // Register for network changes
+        NetworkUtils.registerNetworkCallback(this, new NetworkUtils.NetworkCallback() {
+            @Override
+            public void onNetworkAvailable() {
+                runOnUiThread(() -> {
+                    isOffline = false;
+                    updateOfflineIndicator();
+                    // Trigger sync of any pending trips
+                    offlineManager.syncNow();
+                });
+            }
+
+            @Override
+            public void onNetworkLost() {
+                runOnUiThread(() -> {
+                    isOffline = true;
+                    updateOfflineIndicator();
+                });
+            }
+        });
+    }
+
+    private void updateOfflineIndicator() {
+        if (tvOfflineIndicator != null) {
+            if (isOffline) {
+                tvOfflineIndicator.setVisibility(TextView.VISIBLE);
+                tvOfflineIndicator.setText("📴 Offline Mode - Trip will sync when online");
+            } else {
+                tvOfflineIndicator.setVisibility(TextView.GONE);
+            }
+        }
     }
 
     private void initMap() {
@@ -245,7 +293,7 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
         long duration = System.currentTimeMillis() - startTime;
         int minutes = (int) (duration / (1000 * 60));
 
-        // Submit trip to API
+        // Submit trip to API or save offline
         submitTripToApi(minutes);
     }
 
@@ -254,7 +302,7 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Check if logged in
         if (!prefManager.isLoggedIn()) {
-            openTripSummary(durationMinutes);
+            openTripSummary(durationMinutes, false);
             return;
         }
 
@@ -283,6 +331,16 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
                 gpsPointsList
         );
 
+        // Check if offline
+        if (isOffline || !NetworkUtils.isNetworkAvailable(this)) {
+            // Save offline
+            offlineManager.saveTripOffline(request);
+            Toast.makeText(this, "📴 Trip saved offline - will sync when online", Toast.LENGTH_LONG).show();
+            openTripSummary(durationMinutes, true);
+            return;
+        }
+
+        // Online - submit to API
         ApiClient.getInstance().getApiService()
                 .submitTrip(request)
                 .enqueue(new Callback<TripResponse>() {
@@ -290,22 +348,31 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
                     public void onResponse(@NonNull Call<TripResponse> call, @NonNull Response<TripResponse> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             Toast.makeText(TripActivity.this, "Trip saved! +" + response.body().getPointsEarned() + " points", Toast.LENGTH_SHORT).show();
+                            openTripSummary(durationMinutes, false);
+                        } else {
+                            // API error - save offline
+                            offlineManager.saveTripOffline(request);
+                            Toast.makeText(TripActivity.this, "Trip saved offline", Toast.LENGTH_SHORT).show();
+                            openTripSummary(durationMinutes, true);
                         }
-                        openTripSummary(durationMinutes);
                     }
 
                     @Override
                     public void onFailure(@NonNull Call<TripResponse> call, @NonNull Throwable t) {
-                        Toast.makeText(TripActivity.this, "Trip saved locally", Toast.LENGTH_SHORT).show();
-                        openTripSummary(durationMinutes);
+                        // Network error - save offline
+                        offlineManager.saveTripOffline(request);
+                        Toast.makeText(TripActivity.this, "📴 Trip saved offline - will sync when online", Toast.LENGTH_LONG).show();
+                        openTripSummary(durationMinutes, true);
                     }
                 });
     }
-    private void openTripSummary(int durationMinutes) {
+
+    private void openTripSummary(int durationMinutes, boolean savedOffline) {
         Intent intent = new Intent(this, TripSummaryActivity.class);
         intent.putExtra(TripSummaryActivity.EXTRA_DURATION, durationMinutes);
         intent.putExtra(TripSummaryActivity.EXTRA_DISTANCE, totalDistance);
         intent.putExtra(TripSummaryActivity.EXTRA_GPS_POINTS, tripPoints.size());
+        intent.putExtra("saved_offline", savedOffline);
         startActivity(intent);
         finish();
     }
@@ -313,6 +380,7 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        NetworkUtils.unregisterNetworkCallback(this);
         if (isTracking) {
             fusedLocationClient.removeLocationUpdates(locationCallback);
             timerHandler.removeCallbacks(timerRunnable);

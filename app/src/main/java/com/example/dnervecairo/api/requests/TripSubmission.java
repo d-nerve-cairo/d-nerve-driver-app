@@ -27,4 +27,25 @@ public class TripSubmission {
         this.endTime = endTime;
         this.gpsPoints = gpsPoints;
     }
+
+    // Getters
+    public String getDriverId() {
+        return driverId;
+    }
+
+    public String getRouteId() {
+        return routeId;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public List<GpsPointRequest> getGpsPoints() {
+        return gpsPoints;
+    }
 }
