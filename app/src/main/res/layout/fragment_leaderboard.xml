@@ -17,6 +17,7 @@
 
     <!-- Your Rank Card -->
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_your_rank"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
@@ -33,9 +34,10 @@
             android:gravity="center_vertical">
 
             <TextView
+                android:id="@+id/tv_your_rank"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:text="#4"
+                android:text="#-"
                 android:textSize="24sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/white"
@@ -76,7 +78,7 @@
                     android:id="@+id/tv_your_points"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="450"
+                    android:text="0"
                     android:textColor="@android:color/white"
                     android:textSize="24sp"
                     android:textStyle="bold"/>
@@ -94,6 +96,7 @@
 
     <!-- Top Drivers Label -->
     <TextView
+        android:id="@+id/tv_top_drivers_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/leaderboard_top_drivers"
@@ -101,12 +104,67 @@
         android:paddingHorizontal="16dp"
         android:paddingBottom="8dp"/>
 
-    <!-- Leaderboard List -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_leaderboard"
+    <!-- Content Container -->
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingHorizontal="16dp"
-        android:clipToPadding="false"/>
+        android:layout_height="match_parent">
+
+        <!-- Leaderboard List -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_leaderboard"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingHorizontal="16dp"
+            android:clipToPadding="false"/>
+
+        <!-- Loading State -->
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"/>
+
+        <!-- Empty/Offline State -->
+        <LinearLayout
+            android:id="@+id/layout_empty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="32dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/iv_empty_icon"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/ic_leaderboard"
+                app:tint="@color/text_secondary"
+                android:alpha="0.5"
+                android:contentDescription="No data"/>
+
+            <TextView
+                android:id="@+id/tv_empty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="No data available"
+                android:textSize="16sp"
+                android:textColor="@color/text_secondary"
+                android:gravity="center"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_retry"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Retry"
+                android:visibility="gone"/>
+
+        </LinearLayout>
+
+    </FrameLayout>
 
 </LinearLayout>

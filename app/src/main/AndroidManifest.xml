@@ -102,6 +102,12 @@
             android:exported="false"
             android:theme="@style/Theme.DNerveDriver" />
 
+        <!-- Start Trip Activity -->
+        <activity
+            android:name=".activities.StartTripActivity"
+            android:exported="false"
+            android:theme="@style/Theme.DNerveDriver" />
+
 
     </application>
 

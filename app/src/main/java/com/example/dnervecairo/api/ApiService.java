@@ -8,6 +8,7 @@ import com.example.dnervecairo.api.responses.DriversListResponse;
 import com.example.dnervecairo.api.responses.DriverScoreResponse;
 import com.example.dnervecairo.api.responses.LeaderboardResponse;
 import com.example.dnervecairo.api.responses.PointsHistoryResponse;
+import com.example.dnervecairo.api.responses.RouteResponse;
 import com.example.dnervecairo.api.responses.TripResponse;
 import com.example.dnervecairo.api.responses.TripsListResponse;
 import com.example.dnervecairo.api.responses.WithdrawalResponse;
@@ -49,8 +50,6 @@ public interface ApiService {
     @POST("trips")
     Call<TripResponse> submitTrip(@Body TripSubmission request);
 
-
-    // Trip History
     @GET("trips")
     Call<TripsListResponse> getTripHistory(
             @Query("driver_id") String driverId,
@@ -58,16 +57,12 @@ public interface ApiService {
             @Query("offset") int offset
     );
 
-
     @GET("drivers/{driver_id}/trips")
     Call<Object> getDriverTrips(
             @Path("driver_id") String driverId,
             @Query("limit") int limit,
             @Query("offset") int offset
     );
-
-    @GET("gamification/drivers/{driver_id}/withdrawals")
-    Call<WithdrawalHistoryResponse> getWithdrawalHistory(@Path("driver_id") String driverId);
 
     // ========== GAMIFICATION ==========
 
@@ -93,15 +88,24 @@ public interface ApiService {
             @Body WithdrawalRequest request
     );
 
-    // ========== SYSTEM ==========
-
-    @GET("health")
-    Call<Object> healthCheck();
+    @GET("gamification/drivers/{driver_id}/withdrawals")
+    Call<WithdrawalHistoryResponse> getWithdrawalHistory(@Path("driver_id") String driverId);
 
     // ========== BADGES ==========
+
     @GET("badges/driver/{driver_id}/progress")
     Call<List<BadgeResponse>> getBadgeProgress(@Path("driver_id") String driverId);
 
     @POST("badges/driver/{driver_id}/check")
     Call<JsonObject> checkBadges(@Path("driver_id") String driverId);
+
+    // ========== ROUTES ==========
+
+    @GET("routes")
+    Call<List<RouteResponse>> getRoutes();
+
+    // ========== SYSTEM ==========
+
+    @GET("health")
+    Call<Object> healthCheck();
 }

@@ -6,6 +6,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,26 +36,49 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 import android.content.Intent;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
 public class TripActivity extends AppCompatActivity implements OnMapReadyCallback {
 
+    private static final String TAG = "TripActivity";
     private static final int LOCATION_PERMISSION_REQUEST = 1001;
+    private static final int MIN_GPS_POINTS = 3;
+    private static final int AVERAGE_SPEED_KMH = 25; // Cairo traffic average
+
+    // Route extras
+    public static final String EXTRA_ROUTE_ID = "route_id";
+    public static final String EXTRA_ROUTE_NAME = "route_name";
+    public static final String EXTRA_START_NAME = "start_name";
+    public static final String EXTRA_END_NAME = "end_name";
+    public static final String EXTRA_START_LAT = "start_lat";
+    public static final String EXTRA_START_LNG = "start_lng";
 
     // UI Elements
     private TextView tvTimer, tvDistance, tvGpsPoints, tvGpsStatus;
-    private TextView tvOfflineIndicator;
+    private TextView tvOfflineIndicator, tvRouteName, tvEta, tvProgressPercent;
+    private TextView tvRemainingDistance, tvSpeed, tvEstimatedPoints, tvPassengerCount;
     private ImageView ivGpsStatus;
-    private MaterialButton btnStopTrip;
+    private MaterialButton btnStopTrip, btnPassengerMinus, btnPassengerPlus;
+    private LinearProgressIndicator progressRoute;
 
     // Map
     private GoogleMap mMap;
@@ -67,6 +91,16 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
     private double totalDistance = 0.0;
     private Location lastLocation;
     private boolean isTracking = false;
+    private float currentSpeed = 0f;
+    private int passengerCount = 0;
+
+    // Route Data
+    private String routeId;
+    private String routeName;
+    private String startName;
+    private String endName;
+    private double totalRouteDistanceKm = 0.0;
+    private LatLng destinationLatLng = null;
 
     // Timer
     private final Handler timerHandler = new Handler(Looper.getMainLooper());
@@ -76,6 +110,9 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
     private OfflineManager offlineManager;
     private boolean isOffline = false;
 
+    // Executor for background tasks
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,11 +120,18 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         offlineManager = new OfflineManager(this);
 
+        // Get route info from intent
+        routeId = getIntent().getStringExtra(EXTRA_ROUTE_ID);
+        routeName = getIntent().getStringExtra(EXTRA_ROUTE_NAME);
+        startName = getIntent().getStringExtra(EXTRA_START_NAME);
+        endName = getIntent().getStringExtra(EXTRA_END_NAME);
+
         initViews();
         initMap();
         initLocationClient();
-        setupStopButton();
+        setupButtons();
         checkNetworkStatus();
+        displayRouteInfo();
     }
 
     private void initViews() {
@@ -98,21 +142,66 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
         ivGpsStatus = findViewById(R.id.iv_gps_status);
         btnStopTrip = findViewById(R.id.btn_stop_trip);
         tvOfflineIndicator = findViewById(R.id.tv_offline_indicator);
+
+        // New views
+        tvRouteName = findViewById(R.id.tv_route_name);
+        tvEta = findViewById(R.id.tv_eta);
+        tvProgressPercent = findViewById(R.id.tv_progress_percent);
+        progressRoute = findViewById(R.id.progress_route);
+        tvRemainingDistance = findViewById(R.id.tv_remaining_distance);
+        tvSpeed = findViewById(R.id.tv_speed);
+        tvEstimatedPoints = findViewById(R.id.tv_estimated_points);
+        tvPassengerCount = findViewById(R.id.tv_passenger_count);
+        btnPassengerMinus = findViewById(R.id.btn_passenger_minus);
+        btnPassengerPlus = findViewById(R.id.btn_passenger_plus);
+    }
+
+    private void displayRouteInfo() {
+        if (routeName != null && !routeName.isEmpty()) {
+            tvRouteName.setText(routeName);
+        } else if (startName != null && endName != null) {
+            tvRouteName.setText(startName + " → " + endName);
+        } else {
+            tvRouteName.setText("Recording Trip...");
+        }
+
+        tvEta.setText("ETA: --");
+        tvProgressPercent.setText("0%");
+        progressRoute.setProgress(0);
+    }
+
+    private void setupButtons() {
+        btnStopTrip.setOnClickListener(v -> stopTrip());
+
+        btnPassengerMinus.setOnClickListener(v -> {
+            if (passengerCount > 0) {
+                passengerCount--;
+                tvPassengerCount.setText(String.valueOf(passengerCount));
+            }
+        });
+
+        btnPassengerPlus.setOnClickListener(v -> {
+            passengerCount++;
+            tvPassengerCount.setText(String.valueOf(passengerCount));
+        });
     }
 
     private void checkNetworkStatus() {
         isOffline = !NetworkUtils.isNetworkAvailable(this);
         updateOfflineIndicator();
 
-        // Register for network changes
         NetworkUtils.registerNetworkCallback(this, new NetworkUtils.NetworkCallback() {
             @Override
             public void onNetworkAvailable() {
                 runOnUiThread(() -> {
                     isOffline = false;
                     updateOfflineIndicator();
-                    // Trigger sync of any pending trips
                     offlineManager.syncNow();
+
+                    // Fetch route distance if not already fetched
+                    if (totalRouteDistanceKm == 0 && endName != null) {
+                        fetchRouteDistance();
+                    }
                 });
             }
 
@@ -158,19 +247,13 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
         };
     }
 
-    private void setupStopButton() {
-        btnStopTrip.setOnClickListener(v -> stopTrip());
-    }
-
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Map settings
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
-        // Check permission and start tracking
         if (checkLocationPermission()) {
             mMap.setMyLocationEnabled(true);
             startTracking();
@@ -210,19 +293,135 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
         isTracking = true;
         startTime = System.currentTimeMillis();
 
-        // Start timer
         startTimer();
+        updateGpsStatus(true);
+        getLastKnownLocation();
 
-        // Start location updates
         LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000)
                 .setMinUpdateIntervalMillis(3000)
+                .setWaitForAccurateLocation(false)
                 .build();
 
         if (checkLocationPermission()) {
             fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
         }
 
-        updateGpsStatus(true);
+        // Fetch route distance from Google Directions API
+        if (!isOffline && endName != null) {
+            fetchRouteDistance();
+        }
+    }
+
+    private void getLastKnownLocation() {
+        if (checkLocationPermission()) {
+            fusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, location -> {
+                        if (location != null && tripPoints.isEmpty()) {
+                            onNewLocation(location);
+                            Toast.makeText(this, "📍 GPS location found", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnFailureListener(this, e -> {
+                        // Last location not available
+                    });
+        }
+    }
+
+    private void fetchRouteDistance() {
+        if (tripPoints.isEmpty() || endName == null) return;
+
+        LatLng startPoint = tripPoints.get(0);
+        String origin = startPoint.latitude + "," + startPoint.longitude;
+        String destination = endName + ", Cairo, Egypt";
+
+        executor.execute(() -> {
+            try {
+                // Get API key from manifest
+                String apiKey = getApiKeyFromManifest();
+                if (apiKey == null || apiKey.isEmpty()) {
+                    Log.e(TAG, "Google Maps API key not found");
+                    runOnUiThread(this::estimateRouteDistance);
+                    return;
+                }
+
+                String urlStr = "https://maps.googleapis.com/maps/api/directions/json" +
+                        "?origin=" + origin +
+                        "&destination=" + java.net.URLEncoder.encode(destination, "UTF-8") +
+                        "&mode=driving" +
+                        "&key=" + apiKey;
+
+                URL url = new URL(urlStr);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.setConnectTimeout(10000);
+                conn.setReadTimeout(10000);
+
+                int responseCode = conn.getResponseCode();
+                if (responseCode != 200) {
+                    Log.e(TAG, "Directions API error: " + responseCode);
+                    runOnUiThread(this::estimateRouteDistance);
+                    return;
+                }
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JSONObject json = new JSONObject(response.toString());
+                if (json.getString("status").equals("OK")) {
+                    JSONArray routes = json.getJSONArray("routes");
+                    if (routes.length() > 0) {
+                        JSONObject route = routes.getJSONObject(0);
+                        JSONArray legs = route.getJSONArray("legs");
+                        if (legs.length() > 0) {
+                            JSONObject leg = legs.getJSONObject(0);
+                            int distanceMeters = leg.getJSONObject("distance").getInt("value");
+                            totalRouteDistanceKm = distanceMeters / 1000.0;
+
+                            // Get destination coordinates
+                            JSONObject endLocation = leg.getJSONObject("end_location");
+                            double endLat = endLocation.getDouble("lat");
+                            double endLng = endLocation.getDouble("lng");
+                            destinationLatLng = new LatLng(endLat, endLng);
+
+                            Log.d(TAG, "Route distance: " + totalRouteDistanceKm + " km");
+
+                            runOnUiThread(this::updateRouteProgress);
+                        }
+                    }
+                } else {
+                    Log.e(TAG, "Directions API status: " + json.getString("status"));
+                    runOnUiThread(this::estimateRouteDistance);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error fetching route distance: " + e.getMessage());
+                runOnUiThread(this::estimateRouteDistance);
+            }
+        });
+    }
+
+    private String getApiKeyFromManifest() {
+        try {
+            android.content.pm.ApplicationInfo appInfo = getPackageManager()
+                    .getApplicationInfo(getPackageName(), android.content.pm.PackageManager.GET_META_DATA);
+            if (appInfo.metaData != null) {
+                return appInfo.metaData.getString("com.google.android.geo.API_KEY");
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting API key: " + e.getMessage());
+        }
+        return null;
+    }
+
+    private void estimateRouteDistance() {
+        // Option A: Simple estimate based on Cairo average trip
+        if (totalRouteDistanceKm == 0) {
+            totalRouteDistanceKm = 10.0; // Default 10km estimate
+        }
     }
 
     private void startTimer() {
@@ -245,34 +444,109 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
         LatLng newPoint = new LatLng(location.getLatitude(), location.getLongitude());
         tripPoints.add(newPoint);
 
+        updateGpsStatus(true);
+
         // Update distance
         if (lastLocation != null) {
-            totalDistance += lastLocation.distanceTo(location) / 1000.0; // km
-            tvDistance.setText(String.format(Locale.getDefault(), "%.2f km", totalDistance));
+            totalDistance += lastLocation.distanceTo(location) / 1000.0;
+            tvDistance.setText(String.format(Locale.getDefault(), "%.1f km", totalDistance));
         }
+
+        // Update speed
+        if (location.hasSpeed()) {
+            currentSpeed = location.getSpeed() * 3.6f; // m/s to km/h
+        } else if (lastLocation != null) {
+            float timeDiff = (location.getTime() - lastLocation.getTime()) / 1000f;
+            if (timeDiff > 0) {
+                float distanceM = lastLocation.distanceTo(location);
+                currentSpeed = (distanceM / timeDiff) * 3.6f;
+            }
+        }
+        tvSpeed.setText(String.format(Locale.getDefault(), "%.0f km/h", currentSpeed));
+
         lastLocation = location;
 
         // Update GPS points count
         tvGpsPoints.setText(String.valueOf(tripPoints.size()));
 
-        // Move camera
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newPoint, 16));
+        // Update estimated points (based on distance and quality)
+        int estimatedPoints = (int) (totalDistance * 5 + tripPoints.size() * 0.5);
+        tvEstimatedPoints.setText("+" + estimatedPoints + " pts");
 
-        // Draw path
-        if (tripPoints.size() > 1) {
-            mMap.clear();
-            mMap.addPolyline(new PolylineOptions()
-                    .addAll(tripPoints)
-                    .width(10)
-                    .color(getResources().getColor(R.color.primary, null)));
+        // Update route progress
+        updateRouteProgress();
+
+        // Move camera
+        if (mMap != null) {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newPoint, 16));
+
+            if (tripPoints.size() > 1) {
+                mMap.clear();
+                mMap.addPolyline(new PolylineOptions()
+                        .addAll(tripPoints)
+                        .width(10)
+                        .color(getResources().getColor(R.color.primary, null)));
+            }
+        }
+    }
+
+    private void updateRouteProgress() {
+        double remainingKm;
+        int progressPercent;
+
+        if (totalRouteDistanceKm > 0) {
+            // Option B: Use actual route distance
+            remainingKm = Math.max(0, totalRouteDistanceKm - totalDistance);
+            progressPercent = (int) Math.min(100, (totalDistance / totalRouteDistanceKm) * 100);
+        } else if (destinationLatLng != null && lastLocation != null) {
+            // Fallback: Calculate straight-line distance to destination
+            float[] results = new float[1];
+            Location.distanceBetween(
+                    lastLocation.getLatitude(), lastLocation.getLongitude(),
+                    destinationLatLng.latitude, destinationLatLng.longitude,
+                    results);
+            remainingKm = results[0] / 1000.0;
+
+            // Estimate total based on traveled + remaining
+            double estimatedTotal = totalDistance + remainingKm;
+            progressPercent = (int) Math.min(100, (totalDistance / estimatedTotal) * 100);
+        } else {
+            // Option A: Simple estimate
+            remainingKm = Math.max(0, 10.0 - totalDistance);
+            progressPercent = (int) Math.min(100, totalDistance * 10);
+        }
+
+        // Update UI
+        tvRemainingDistance.setText(String.format(Locale.getDefault(), "%.1f km", remainingKm));
+        tvProgressPercent.setText(progressPercent + "%");
+        progressRoute.setProgress(progressPercent);
+
+        // Calculate ETA
+        int etaMinutes;
+        if (currentSpeed > 5) {
+            etaMinutes = (int) (remainingKm / currentSpeed * 60);
+        } else {
+            etaMinutes = (int) (remainingKm / AVERAGE_SPEED_KMH * 60);
+        }
+
+        if (etaMinutes > 0) {
+            tvEta.setText("ETA: " + etaMinutes + "m");
+        } else {
+            tvEta.setText("Arriving");
         }
     }
 
     private void updateGpsStatus(boolean active) {
         if (active) {
-            tvGpsStatus.setText("GPS Active");
-            tvGpsStatus.setTextColor(getResources().getColor(R.color.success, null));
-            ivGpsStatus.setColorFilter(getResources().getColor(R.color.success, null));
+            if (tripPoints.isEmpty()) {
+                tvGpsStatus.setText("Waiting for GPS...");
+                tvGpsStatus.setTextColor(getResources().getColor(R.color.warning, null));
+                ivGpsStatus.setColorFilter(getResources().getColor(R.color.warning, null));
+            } else {
+                tvGpsStatus.setText("GPS Active");
+                tvGpsStatus.setTextColor(getResources().getColor(R.color.success, null));
+                ivGpsStatus.setColorFilter(getResources().getColor(R.color.success, null));
+            }
         } else {
             tvGpsStatus.setText("GPS Off");
             tvGpsStatus.setTextColor(getResources().getColor(R.color.error, null));
@@ -283,44 +557,47 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void stopTrip() {
         isTracking = false;
 
-        // Stop timer
         timerHandler.removeCallbacks(timerRunnable);
-
-        // Stop location updates
         fusedLocationClient.removeLocationUpdates(locationCallback);
 
-        // Calculate trip duration in minutes
+        if (tripPoints.size() < MIN_GPS_POINTS) {
+            Toast.makeText(this, "Trip too short - need at least " + MIN_GPS_POINTS + " GPS points. Please try again outdoors.", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+
         long duration = System.currentTimeMillis() - startTime;
         int minutes = (int) (duration / (1000 * 60));
 
-        // Submit trip to API or save offline
         submitTripToApi(minutes);
     }
 
     private void submitTripToApi(int durationMinutes) {
         PreferenceManager prefManager = new PreferenceManager(this);
 
-        // Check if logged in
         if (!prefManager.isLoggedIn()) {
             openTripSummary(durationMinutes, false);
             return;
         }
 
-        // Convert LatLng list to GpsPointRequest list
         List<GpsPointRequest> gpsPointsList = new ArrayList<>();
         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault());
         sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
 
-        for (LatLng point : tripPoints) {
+        long tripDurationMs = System.currentTimeMillis() - startTime;
+        long intervalMs = tripPoints.size() > 1 ? tripDurationMs / (tripPoints.size() - 1) : 0;
+
+        for (int i = 0; i < tripPoints.size(); i++) {
+            LatLng point = tripPoints.get(i);
+            long pointTime = startTime + (i * intervalMs);
             gpsPointsList.add(new GpsPointRequest(
                     point.latitude,
                     point.longitude,
-                    sdf.format(new java.util.Date()),
+                    sdf.format(new java.util.Date(pointTime)),
                     10.0f
             ));
         }
 
-        // Calculate start and end times
         String endTime = sdf.format(new java.util.Date());
         String startTimeStr = sdf.format(new java.util.Date(startTime));
 
@@ -331,16 +608,13 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
                 gpsPointsList
         );
 
-        // Check if offline
         if (isOffline || !NetworkUtils.isNetworkAvailable(this)) {
-            // Save offline
             offlineManager.saveTripOffline(request);
             Toast.makeText(this, "📴 Trip saved offline - will sync when online", Toast.LENGTH_LONG).show();
             openTripSummary(durationMinutes, true);
             return;
         }
 
-        // Online - submit to API
         ApiClient.getInstance().getApiService()
                 .submitTrip(request)
                 .enqueue(new Callback<TripResponse>() {
@@ -350,7 +624,6 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
                             Toast.makeText(TripActivity.this, "Trip saved! +" + response.body().getPointsEarned() + " points", Toast.LENGTH_SHORT).show();
                             openTripSummary(durationMinutes, false);
                         } else {
-                            // API error - save offline
                             offlineManager.saveTripOffline(request);
                             Toast.makeText(TripActivity.this, "Trip saved offline", Toast.LENGTH_SHORT).show();
                             openTripSummary(durationMinutes, true);
@@ -359,7 +632,6 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     @Override
                     public void onFailure(@NonNull Call<TripResponse> call, @NonNull Throwable t) {
-                        // Network error - save offline
                         offlineManager.saveTripOffline(request);
                         Toast.makeText(TripActivity.this, "📴 Trip saved offline - will sync when online", Toast.LENGTH_LONG).show();
                         openTripSummary(durationMinutes, true);
@@ -373,6 +645,8 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
         intent.putExtra(TripSummaryActivity.EXTRA_DISTANCE, totalDistance);
         intent.putExtra(TripSummaryActivity.EXTRA_GPS_POINTS, tripPoints.size());
         intent.putExtra("saved_offline", savedOffline);
+        intent.putExtra("route_name", routeName);
+        intent.putExtra("passenger_count", passengerCount);
         startActivity(intent);
         finish();
     }
@@ -381,6 +655,7 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onDestroy() {
         super.onDestroy();
         NetworkUtils.unregisterNetworkCallback(this);
+        executor.shutdown();
         if (isTracking) {
             fusedLocationClient.removeLocationUpdates(locationCallback);
             timerHandler.removeCallbacks(timerRunnable);

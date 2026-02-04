@@ -18,6 +18,9 @@ import com.example.dnervecairo.activities.LoginActivity;
 import com.example.dnervecairo.activities.SettingsActivity;
 import com.example.dnervecairo.api.ApiClient;
 import com.example.dnervecairo.api.responses.DriverResponse;
+import com.example.dnervecairo.database.CachedDriverEntity;
+import com.example.dnervecairo.utils.NetworkUtils;
+import com.example.dnervecairo.utils.OfflineManager;
 import com.example.dnervecairo.utils.PreferenceManager;
 import com.google.android.material.button.MaterialButton;
 import com.example.dnervecairo.activities.EditProfileActivity;
@@ -31,6 +34,7 @@ public class ProfileFragment extends Fragment {
     private TextView tvName, tvTier, tvMemberSince, tvTotalTrips, tvTotalPoints, tvAvgQuality;
     private TextView tvPhone, tvEmail, tvVehicleType, tvPlate;
     private PreferenceManager prefManager;
+    private OfflineManager offlineManager;
 
     @Nullable
     @Override
@@ -38,6 +42,7 @@ public class ProfileFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
         prefManager = new PreferenceManager(requireContext());
+        offlineManager = new OfflineManager(requireContext());
 
         initViews(view);
         setupButtons(view);
@@ -84,30 +89,71 @@ public class ProfileFragment extends Fragment {
 
     private void loadProfileData() {
         if (!prefManager.isLoggedIn()) {
-            displaySampleData();
+            displaySavedOrDefaultData();
             return;
         }
 
         String driverId = prefManager.getDriverId();
 
-        ApiClient.getInstance().getApiService()
-                .getDriver(driverId)
-                .enqueue(new Callback<DriverResponse>() {
-                    @Override
-                    public void onResponse(@NonNull Call<DriverResponse> call, @NonNull Response<DriverResponse> response) {
-                        if (response.isSuccessful() && response.body() != null) {
-                            displayDriverProfile(response.body());
-                        } else {
-                            displaySampleData();
+        // Check if online
+        if (NetworkUtils.isNetworkAvailable(requireContext())) {
+            // Online - fetch from API
+            ApiClient.getInstance().getApiService()
+                    .getDriver(driverId)
+                    .enqueue(new Callback<DriverResponse>() {
+                        @Override
+                        public void onResponse(@NonNull Call<DriverResponse> call, @NonNull Response<DriverResponse> response) {
+                            if (response.isSuccessful() && response.body() != null) {
+                                DriverResponse driver = response.body();
+                                displayDriverProfile(driver);
+                                // Cache for offline use
+                                offlineManager.cacheDriverData(driver);
+                                // Save to SharedPreferences
+                                prefManager.saveDriverData(
+                                        driver.getName(),
+                                        driver.getTotalPoints(),
+                                        driver.getTier(),
+                                        driver.getTripsCompleted(),
+                                        driver.getQualityAvg(),
+                                        driver.getCurrentStreak()
+                                );
+                                // Save additional profile data
+                                prefManager.saveProfileData(
+                                        driver.getPhone(),
+                                        driver.getVehicleType(),
+                                        driver.getLicensePlate(),
+                                        driver.getCreatedAt()
+                                );
+                            } else {
+                                loadCachedData(driverId);
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onFailure(@NonNull Call<DriverResponse> call, @NonNull Throwable t) {
-                        Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show();
-                        displaySampleData();
-                    }
-                });
+                        @Override
+                        public void onFailure(@NonNull Call<DriverResponse> call, @NonNull Throwable t) {
+                            loadCachedData(driverId);
+                        }
+                    });
+        } else {
+            // Offline - load from cache
+            loadCachedData(driverId);
+        }
+    }
+
+    private void loadCachedData(String driverId) {
+        // First try Room database
+        offlineManager.getCachedDriver(driverId, cachedDriver -> {
+            if (getActivity() == null) return;
+
+            getActivity().runOnUiThread(() -> {
+                if (cachedDriver != null) {
+                    displayCachedProfile(cachedDriver);
+                } else {
+                    // Fallback to SharedPreferences
+                    displaySavedOrDefaultData();
+                }
+            });
+        });
     }
 
     private void displayDriverProfile(DriverResponse driver) {
@@ -118,25 +164,54 @@ public class ProfileFragment extends Fragment {
         tvTotalPoints.setText(String.valueOf(driver.getTotalPoints()));
         tvAvgQuality.setText(String.format("%.0f%%", driver.getQualityAvg()));
         tvPhone.setText(driver.getPhone());
-        tvEmail.setText("N/A"); // API doesn't return email
+        tvEmail.setText("N/A");
         tvVehicleType.setText(driver.getVehicleType());
         tvPlate.setText(driver.getLicensePlate());
     }
 
-    private void displaySampleData() {
-        tvName.setText("Ahmed Driver");
-        tvTier.setText("🥉 Bronze Driver");
-        tvMemberSince.setText("Member since Jan 2026");
-        tvTotalTrips.setText("47");
-        tvTotalPoints.setText("450");
-        tvAvgQuality.setText("87%");
-        tvPhone.setText("+20 123 456 7890");
-        tvEmail.setText("ahmed@example.com");
-        tvVehicleType.setText("Microbus - Toyota HiAce");
-        tvPlate.setText("ج ن و  1234");
+    private void displayCachedProfile(CachedDriverEntity driver) {
+        tvName.setText(driver.getName());
+        tvTier.setText(getTierEmoji(driver.getTier()) + " " + driver.getTier() + " Driver");
+        tvMemberSince.setText("Member since (cached)");
+        tvTotalTrips.setText(String.valueOf(driver.getTripsCompleted()));
+        tvTotalPoints.setText(String.valueOf(driver.getTotalPoints()));
+        tvAvgQuality.setText(String.format("%.0f%%", driver.getQualityAvg() * 100));
+        tvPhone.setText(driver.getPhone() != null ? driver.getPhone() : "N/A");
+        tvEmail.setText("N/A");
+        tvVehicleType.setText(driver.getVehicleType() != null ? driver.getVehicleType() : "Microbus");
+        tvPlate.setText(driver.getLicensePlate() != null ? driver.getLicensePlate() : "N/A");
+    }
+
+    private void displaySavedOrDefaultData() {
+        if (prefManager.hasDriverData()) {
+            // Show last known data from SharedPreferences
+            tvName.setText(prefManager.getDriverName());
+            tvTier.setText(getTierEmoji(prefManager.getDriverTier()) + " " + prefManager.getDriverTier() + " Driver");
+            tvMemberSince.setText("Member since " + prefManager.getMemberSince());
+            tvTotalTrips.setText(String.valueOf(prefManager.getDriverTrips()));
+            tvTotalPoints.setText(String.valueOf(prefManager.getDriverPoints()));
+            tvAvgQuality.setText(String.format("%.0f%%", prefManager.getDriverQuality()));
+            tvPhone.setText(prefManager.getDriverPhone());
+            tvEmail.setText("N/A");
+            tvVehicleType.setText(prefManager.getDriverVehicleType());
+            tvPlate.setText(prefManager.getDriverPlate());
+        } else {
+            // No data ever saved - show placeholder
+            tvName.setText("Driver");
+            tvTier.setText("🥉 Bronze Driver");
+            tvMemberSince.setText("Not available");
+            tvTotalTrips.setText("0");
+            tvTotalPoints.setText("0");
+            tvAvgQuality.setText("0%");
+            tvPhone.setText("N/A");
+            tvEmail.setText("N/A");
+            tvVehicleType.setText("N/A");
+            tvPlate.setText("N/A");
+        }
     }
 
     private String getTierEmoji(String tier) {
+        if (tier == null) return "🥉";
         switch (tier.toLowerCase()) {
             case "platinum": return "💎";
             case "gold": return "🥇";
@@ -146,12 +221,11 @@ public class ProfileFragment extends Fragment {
     }
 
     private String formatDate(String dateStr) {
-        if (dateStr == null) return "Jan 2026";
-        // Simple formatting - you can improve this
+        if (dateStr == null) return "N/A";
         try {
             return dateStr.substring(0, 10);
         } catch (Exception e) {
-            return "Jan 2026";
+            return "N/A";
         }
     }
 
@@ -159,9 +233,14 @@ public class ProfileFragment extends Fragment {
         prefManager.clear();
         Toast.makeText(getContext(), "Logged out", Toast.LENGTH_SHORT).show();
 
-        // Go to login screen
         Intent intent = new Intent(getActivity(), LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadProfileData(); // Refresh data when returning to screen
     }
 }
