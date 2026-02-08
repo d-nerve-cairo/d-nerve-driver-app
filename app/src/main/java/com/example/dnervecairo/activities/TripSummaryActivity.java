@@ -1,6 +1,8 @@
 package com.example.dnervecairo.activities;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +18,9 @@ public class TripSummaryActivity extends AppCompatActivity {
     public static final String EXTRA_DURATION = "duration";
     public static final String EXTRA_DISTANCE = "distance";
     public static final String EXTRA_GPS_POINTS = "gps_points";
+    public static final String EXTRA_ROUTE_NAME = "route_name";
+    public static final String EXTRA_PASSENGER_COUNT = "passenger_count";
+    public static final String EXTRA_SAVED_OFFLINE = "saved_offline";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,23 +31,44 @@ public class TripSummaryActivity extends AppCompatActivity {
         int durationMinutes = getIntent().getIntExtra(EXTRA_DURATION, 0);
         double distance = getIntent().getDoubleExtra(EXTRA_DISTANCE, 0.0);
         int gpsPoints = getIntent().getIntExtra(EXTRA_GPS_POINTS, 0);
+        String routeName = getIntent().getStringExtra(EXTRA_ROUTE_NAME);
+        int passengerCount = getIntent().getIntExtra(EXTRA_PASSENGER_COUNT, 0);
+        boolean savedOffline = getIntent().getBooleanExtra(EXTRA_SAVED_OFFLINE, false);
 
         // Calculate points
         int basePoints = 10;
         int qualityBonus = calculateQualityBonus(gpsPoints, durationMinutes);
         int peakBonus = calculatePeakBonus();
-        int totalPoints = basePoints + qualityBonus + peakBonus;
+        int passengerBonus = calculatePassengerBonus(passengerCount);
+        int totalPoints = basePoints + qualityBonus + peakBonus + passengerBonus;
 
         // Calculate quality score
         int qualityScore = calculateQualityScore(gpsPoints, durationMinutes);
 
         // Update UI
+        displayRouteInfo(routeName, passengerCount);
         displayTripDetails(durationMinutes, distance, gpsPoints, qualityScore);
-        displayPointsBreakdown(basePoints, qualityBonus, peakBonus, totalPoints);
+        displayPointsBreakdown(basePoints, qualityBonus, peakBonus, passengerBonus, totalPoints);
+        displayOfflineStatus(savedOffline);
 
         // Back button
         MaterialButton btnBackHome = findViewById(R.id.btn_back_home);
         btnBackHome.setOnClickListener(v -> finish());
+    }
+
+    private void displayRouteInfo(String routeName, int passengerCount) {
+        TextView tvRouteName = findViewById(R.id.tv_route_name);
+        TextView tvPassengerCount = findViewById(R.id.tv_passenger_count);
+        LinearLayout layoutRouteInfo = findViewById(R.id.layout_route_info);
+
+        if (routeName != null && !routeName.isEmpty()) {
+            tvRouteName.setText(routeName);
+            layoutRouteInfo.setVisibility(View.VISIBLE);
+        } else {
+            layoutRouteInfo.setVisibility(View.GONE);
+        }
+
+        tvPassengerCount.setText(String.valueOf(passengerCount));
     }
 
     private void displayTripDetails(int duration, double distance, int gpsPoints, int quality) {
@@ -68,18 +94,38 @@ public class TripSummaryActivity extends AppCompatActivity {
         }
     }
 
-    private void displayPointsBreakdown(int base, int quality, int peak, int total) {
+    private void displayPointsBreakdown(int base, int quality, int peak, int passenger, int total) {
         TextView tvPointsEarned = findViewById(R.id.tv_points_earned);
         TextView tvBasePoints = findViewById(R.id.tv_base_points);
         TextView tvQualityBonus = findViewById(R.id.tv_quality_bonus);
         TextView tvPeakBonus = findViewById(R.id.tv_peak_bonus);
+        TextView tvPassengerBonus = findViewById(R.id.tv_passenger_bonus);
         TextView tvTotalPoints = findViewById(R.id.tv_total_points);
+        LinearLayout layoutPassengerBonus = findViewById(R.id.layout_passenger_bonus);
 
         tvPointsEarned.setText(String.format(Locale.getDefault(), "+%d", total));
         tvBasePoints.setText(String.valueOf(base));
         tvQualityBonus.setText(String.format(Locale.getDefault(), "+%d", quality));
         tvPeakBonus.setText(String.format(Locale.getDefault(), "+%d", peak));
+
+        // Show passenger bonus only if there are passengers
+        if (passenger > 0) {
+            layoutPassengerBonus.setVisibility(View.VISIBLE);
+            tvPassengerBonus.setText(String.format(Locale.getDefault(), "+%d", passenger));
+        } else {
+            layoutPassengerBonus.setVisibility(View.GONE);
+        }
+
         tvTotalPoints.setText(String.valueOf(total));
+    }
+
+    private void displayOfflineStatus(boolean savedOffline) {
+        TextView tvOfflineStatus = findViewById(R.id.tv_offline_status);
+        if (savedOffline) {
+            tvOfflineStatus.setVisibility(View.VISIBLE);
+        } else {
+            tvOfflineStatus.setVisibility(View.GONE);
+        }
     }
 
     private int calculateQualityScore(int gpsPoints, int durationMinutes) {
@@ -105,5 +151,10 @@ public class TripSummaryActivity extends AppCompatActivity {
             return 3;
         }
         return 0;
+    }
+
+    private int calculatePassengerBonus(int passengerCount) {
+        // 1 point per passenger, max 10
+        return Math.min(passengerCount, 10);
     }
 }

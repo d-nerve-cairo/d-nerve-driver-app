@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -18,24 +18,135 @@
         <ImageView
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:layout_marginTop="24dp"
-            android:src="@drawable/ic_verified"
+            android:src="@drawable/ic_check_circle"
             app:tint="@color/success"
-            android:contentDescription="Trip Complete"/>
+            android:contentDescription="Success" />
 
-        <!-- Title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/trip_complete"
-            android:textAppearance="@style/TextAppearance.DNerve.H2"
-            android:layout_marginTop="16dp"/>
+            android:text="Trip Completed!"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            android:layout_marginTop="16dp" />
+
+        <!-- Offline Status Banner -->
+        <TextView
+            android:id="@+id/tv_offline_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFF3E0"
+            android:padding="12dp"
+            android:text="📴 Trip saved offline - will sync when online"
+            android:textColor="#E65100"
+            android:textAlignment="center"
+            android:textSize="12sp"
+            android:layout_marginTop="16dp"
+            android:visibility="gone" />
+
+        <!-- Route Info Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_route_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@color/primary">
+
+            <LinearLayout
+                android:id="@+id/layout_route_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_directions_bus"
+                    app:tint="@android:color/white"
+                    android:contentDescription="Route" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Route"
+                        android:textSize="12sp"
+                        android:textColor="#B3FFFFFF" />
+
+                    <TextView
+                        android:id="@+id/tv_route_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ramses → Giza"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white"
+                        android:ellipsize="end"
+                        android:maxLines="1" />
+
+                </LinearLayout>
+
+                <!-- Passenger Info -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_people"
+                            app:tint="@android:color/white"
+                            android:contentDescription="Passengers" />
+
+                        <TextView
+                            android:id="@+id/tv_passenger_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:text="0"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="@android:color/white" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Passengers"
+                        android:textSize="10sp"
+                        android:textColor="#B3FFFFFF" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Points Earned Card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp"
             app:cardBackgroundColor="@color/accent">
@@ -44,26 +155,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="24dp"
+                android:padding="20dp"
                 android:gravity="center">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Points Earned"
-                    android:textColor="@android:color/white"
-                    android:textSize="14sp"/>
+                    android:textSize="14sp"
+                    android:textColor="#B3FFFFFF" />
 
                 <TextView
                     android:id="@+id/tv_points_earned"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="+15"
-                    android:textColor="@android:color/white"
-                    android:textSize="56sp"
-                    android:textStyle="bold"/>
+                    android:text="+18"
+                    android:textSize="48sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/white" />
 
             </LinearLayout>
+
         </com.google.android.material.card.MaterialCardView>
 
         <!-- Trip Details Card -->
@@ -71,9 +183,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="2dp"
-            app:cardBackgroundColor="@color/surface">
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -84,103 +195,127 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/trip_details"
-                    android:textAppearance="@style/TextAppearance.DNerve.H4"
-                    android:layout_marginBottom="16dp"/>
+                    android:text="Trip Details"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="12dp" />
 
-                <!-- Duration Row -->
+                <!-- Stats Row -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginBottom="12dp">
+                    android:baselineAligned="false">
 
-                    <TextView
+                    <!-- Duration -->
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/trip_duration"
-                        android:textAppearance="@style/TextAppearance.DNerve.Body2"/>
+                        android:orientation="vertical"
+                        android:gravity="center">
 
-                    <TextView
-                        android:id="@+id/tv_duration"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="25 min"
-                        android:textAppearance="@style/TextAppearance.DNerve.Body1"
-                        android:textStyle="bold"/>
-                </LinearLayout>
+                        <TextView
+                            android:id="@+id/tv_duration"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="15 min"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/primary" />
 
-                <!-- Distance Row -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="12dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Duration"
+                            android:textSize="12sp"
+                            android:textColor="@color/text_secondary" />
 
-                    <TextView
+                    </LinearLayout>
+
+                    <!-- Distance -->
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/trip_distance"
-                        android:textAppearance="@style/TextAppearance.DNerve.Body2"/>
+                        android:orientation="vertical"
+                        android:gravity="center">
 
-                    <TextView
-                        android:id="@+id/tv_distance"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="8.5 km"
-                        android:textAppearance="@style/TextAppearance.DNerve.Body1"
-                        android:textStyle="bold"/>
-                </LinearLayout>
+                        <TextView
+                            android:id="@+id/tv_distance"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="3.5 km"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/primary" />
 
-                <!-- GPS Points Row -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="12dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Distance"
+                            android:textSize="12sp"
+                            android:textColor="@color/text_secondary" />
 
-                    <TextView
+                    </LinearLayout>
+
+                    <!-- GPS Points -->
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/trip_gps_points"
-                        android:textAppearance="@style/TextAppearance.DNerve.Body2"/>
+                        android:orientation="vertical"
+                        android:gravity="center">
 
-                    <TextView
-                        android:id="@+id/tv_gps_points"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="52"
-                        android:textAppearance="@style/TextAppearance.DNerve.Body1"
-                        android:textStyle="bold"/>
-                </LinearLayout>
+                        <TextView
+                            android:id="@+id/tv_gps_points"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="25"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/success" />
 
-                <!-- Quality Row -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="GPS Points"
+                            android:textSize="12sp"
+                            android:textColor="@color/text_secondary" />
 
-                    <TextView
+                    </LinearLayout>
+
+                    <!-- Quality -->
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/trip_quality"
-                        android:textAppearance="@style/TextAppearance.DNerve.Body2"/>
+                        android:orientation="vertical"
+                        android:gravity="center">
 
-                    <TextView
-                        android:id="@+id/tv_quality"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="85%"
-                        android:textAppearance="@style/TextAppearance.DNerve.Body1"
-                        android:textStyle="bold"
-                        android:textColor="@color/success"/>
+                        <TextView
+                            android:id="@+id/tv_quality"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="92%"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/quality_excellent" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Quality"
+                            android:textSize="12sp"
+                            android:textColor="@color/text_secondary" />
+
+                    </LinearLayout>
+
                 </LinearLayout>
 
             </LinearLayout>
+
         </com.google.android.material.card.MaterialCardView>
 
         <!-- Points Breakdown Card -->
@@ -188,9 +323,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="2dp"
-            app:cardBackgroundColor="@color/surface">
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -201,120 +335,197 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/trip_points_breakdown"
-                    android:textAppearance="@style/TextAppearance.DNerve.H4"
-                    android:layout_marginBottom="16dp"/>
+                    android:text="Points Breakdown"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="12dp" />
 
                 <!-- Base Points -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginBottom="8dp">
+                    android:paddingVertical="8dp">
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/trip_base_points"
-                        android:textAppearance="@style/TextAppearance.DNerve.Body2"/>
+                        android:text="Base Points"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_secondary" />
 
                     <TextView
                         android:id="@+id/tv_base_points"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="10"
-                        android:textAppearance="@style/TextAppearance.DNerve.Body1"/>
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary" />
+
                 </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/divider" />
 
                 <!-- Quality Bonus -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginBottom="8dp">
+                    android:paddingVertical="8dp">
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/trip_quality_bonus"
-                        android:textAppearance="@style/TextAppearance.DNerve.Body2"/>
+                        android:text="Quality Bonus"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_secondary" />
 
                     <TextView
                         android:id="@+id/tv_quality_bonus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="+2"
-                        android:textAppearance="@style/TextAppearance.DNerve.Body1"
-                        android:textColor="@color/success"/>
+                        android:text="+5"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/success" />
+
                 </LinearLayout>
 
-                <!-- Peak Bonus -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/divider" />
+
+                <!-- Peak Hour Bonus -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginBottom="12dp">
+                    android:paddingVertical="8dp">
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/trip_peak_bonus"
-                        android:textAppearance="@style/TextAppearance.DNerve.Body2"/>
+                        android:text="Peak Hour Bonus"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_secondary" />
 
                     <TextView
                         android:id="@+id/tv_peak_bonus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="+3"
-                        android:textAppearance="@style/TextAppearance.DNerve.Body1"
-                        android:textColor="@color/success"/>
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/warning" />
+
                 </LinearLayout>
 
-                <!-- Divider -->
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/divider"
-                    android:layout_marginBottom="12dp"/>
+                    android:background="@color/divider" />
+
+                <!-- Passenger Bonus -->
+                <LinearLayout
+                    android:id="@+id/layout_passenger_bonus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingVertical="8dp"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_people"
+                            app:tint="@color/text_secondary"
+                            android:layout_marginEnd="4dp"
+                            android:contentDescription="Passengers" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Passenger Bonus"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tv_passenger_bonus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="+5"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/divider" />
 
                 <!-- Total -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingVertical="12dp">
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/trip_total"
-                        android:textAppearance="@style/TextAppearance.DNerve.H4"/>
+                        android:text="Total"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary" />
 
                     <TextView
                         android:id="@+id/tv_total_points"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="15"
-                        android:textAppearance="@style/TextAppearance.DNerve.H4"
-                        android:textColor="@color/accent"/>
+                        android:text="18"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/accent" />
+
                 </LinearLayout>
 
             </LinearLayout>
+
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Back to Home Button -->
+        <!-- Back Button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_back_home"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="24dp"
-            android:layout_marginBottom="24dp"
-            android:text="@string/trip_back_home"
+            android:text="Back to Home"
             android:textSize="16sp"
-            app:cornerRadius="28dp"/>
+            app:cornerRadius="28dp"
+            app:icon="@drawable/ic_home"
+            app:iconGravity="textStart" />
 
     </LinearLayout>
-</ScrollView>
+
+</androidx.core.widget.NestedScrollView>

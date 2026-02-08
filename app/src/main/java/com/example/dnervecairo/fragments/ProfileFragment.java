@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.dnervecairo.R;
 import com.example.dnervecairo.activities.AchievementsActivity;
+import com.example.dnervecairo.activities.DocumentsActivity;
 import com.example.dnervecairo.activities.LoginActivity;
 import com.example.dnervecairo.activities.SettingsActivity;
 import com.example.dnervecairo.api.ApiClient;
@@ -67,21 +68,31 @@ public class ProfileFragment extends Fragment {
     private void setupButtons(View view) {
         MaterialButton btnEditProfile = view.findViewById(R.id.btn_edit_profile);
         MaterialButton btnAchievements = view.findViewById(R.id.btn_achievements);
+        MaterialButton btnDocuments = view.findViewById(R.id.btn_documents);  // NEW
         MaterialButton btnSettings = view.findViewById(R.id.btn_settings);
         MaterialButton btnLogout = view.findViewById(R.id.btn_logout);
 
+        // - Edit Profile button
         btnEditProfile.setOnClickListener(v -> {
             startActivity(new Intent(getActivity(), EditProfileActivity.class));
         });
 
+        // - Achievements button
         btnAchievements.setOnClickListener(v -> {
             startActivity(new Intent(getActivity(), AchievementsActivity.class));
         });
 
+        // - Documents button
+        btnDocuments.setOnClickListener(v -> {
+            startActivity(new Intent(getActivity(), DocumentsActivity.class));
+        });
+
+        // - Settings button
         btnSettings.setOnClickListener(v -> {
             startActivity(new Intent(getActivity(), SettingsActivity.class));
         });
 
+        // - Logout button
         btnLogout.setOnClickListener(v -> {
             logout();
         });

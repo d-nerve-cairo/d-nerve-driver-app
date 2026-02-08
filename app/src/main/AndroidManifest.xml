@@ -108,6 +108,23 @@
             android:exported="false"
             android:theme="@style/Theme.DNerveDriver" />
 
+        <!-- Documents Upload Activity -->
+        <activity
+            android:name=".activities.DocumentsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.DNerveDriver" />
+
+        <!-- File Provider -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
 
     </application>
 

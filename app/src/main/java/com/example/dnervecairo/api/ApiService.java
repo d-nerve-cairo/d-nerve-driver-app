@@ -3,6 +3,8 @@ package com.example.dnervecairo.api;
 import com.example.dnervecairo.api.requests.DriverRegistration;
 import com.example.dnervecairo.api.requests.TripSubmission;
 import com.example.dnervecairo.api.requests.WithdrawalRequest;
+import com.example.dnervecairo.api.responses.DocumentUploadResponse;
+import com.example.dnervecairo.api.responses.DocumentsStatusResponse;
 import com.example.dnervecairo.api.responses.DriverResponse;
 import com.example.dnervecairo.api.responses.DriversListResponse;
 import com.example.dnervecairo.api.responses.DriverScoreResponse;
@@ -18,6 +20,10 @@ import com.example.dnervecairo.api.responses.BadgeResponse;
 import com.google.gson.JsonObject;
 import java.util.List;
 
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+
+
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -25,6 +31,9 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import retrofit2.http.DELETE;
+import retrofit2.http.Multipart;
+import retrofit2.http.Part;
 
 public interface ApiService {
 
@@ -103,6 +112,27 @@ public interface ApiService {
 
     @GET("routes")
     Call<List<RouteResponse>> getRoutes();
+
+
+    // ========== DOCUMENTS ==========
+
+    @GET("documents/driver/{driver_id}")
+    Call<DocumentsStatusResponse> getDriverDocuments(@Path("driver_id") String driverId);
+
+    @Multipart
+    @POST("documents/driver/{driver_id}/upload")
+    Call<DocumentUploadResponse> uploadDocument(
+            @Path("driver_id") String driverId,
+            @Part("document_type") RequestBody documentType,
+            @Part MultipartBody.Part file
+    );
+
+    @DELETE("documents/driver/{driver_id}/{document_type}")
+    Call<Object> deleteDocument(
+            @Path("driver_id") String driverId,
+            @Path("document_type") String documentType
+    );
+
 
     // ========== SYSTEM ==========
 
