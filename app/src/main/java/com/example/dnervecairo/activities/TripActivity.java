@@ -2,6 +2,7 @@ package com.example.dnervecairo.activities;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -33,7 +34,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
@@ -102,6 +106,17 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
     private double totalRouteDistanceKm = 0.0;
     private LatLng destinationLatLng = null;
 
+    // Route coordinates from intent
+    private double routeOriginLat = 0;
+    private double routeOriginLon = 0;
+    private double routeDestLat = 0;
+    private double routeDestLon = 0;
+    private LatLng routeOriginLatLng = null;
+    private LatLng routeDestLatLng = null;
+
+    // Decoded route polyline (follows actual roads)
+    private List<LatLng> routePolylinePoints = new ArrayList<>();
+
     // Timer
     private final Handler timerHandler = new Handler(Looper.getMainLooper());
     private Runnable timerRunnable;
@@ -112,6 +127,10 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     // Executor for background tasks
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
+
+    // Control when to start following driver
+    private boolean shouldFollowDriver = false;
+    private final Handler followHandler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,6 +144,25 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
         routeName = getIntent().getStringExtra(EXTRA_ROUTE_NAME);
         startName = getIntent().getStringExtra(EXTRA_START_NAME);
         endName = getIntent().getStringExtra(EXTRA_END_NAME);
+
+        // Get route coordinates from intent
+        routeOriginLat = getIntent().getDoubleExtra("route_origin_lat", 0);
+        routeOriginLon = getIntent().getDoubleExtra("route_origin_lon", 0);
+        routeDestLat = getIntent().getDoubleExtra("route_dest_lat", 0);
+        routeDestLon = getIntent().getDoubleExtra("route_dest_lon", 0);
+        totalRouteDistanceKm = getIntent().getFloatExtra("route_distance_km", 0);
+
+        // Create LatLng objects if coordinates are valid
+        if (routeOriginLat != 0 && routeOriginLon != 0) {
+            routeOriginLatLng = new LatLng(routeOriginLat, routeOriginLon);
+        }
+        if (routeDestLat != 0 && routeDestLon != 0) {
+            routeDestLatLng = new LatLng(routeDestLat, routeDestLon);
+            destinationLatLng = routeDestLatLng;
+        }
+
+        Log.d(TAG, "Route coordinates received: origin(" + routeOriginLat + "," + routeOriginLon +
+                ") dest(" + routeDestLat + "," + routeDestLon + ")");
 
         initViews();
         initMap();
@@ -168,6 +206,11 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
         tvEta.setText("ETA: --");
         tvProgressPercent.setText("0%");
         progressRoute.setProgress(0);
+
+        // Show initial remaining distance if available
+        if (totalRouteDistanceKm > 0) {
+            tvRemainingDistance.setText(String.format(Locale.getDefault(), "%.1f km", totalRouteDistanceKm));
+        }
     }
 
     private void setupButtons() {
@@ -219,7 +262,7 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (tvOfflineIndicator != null) {
             if (isOffline) {
                 tvOfflineIndicator.setVisibility(TextView.VISIBLE);
-                tvOfflineIndicator.setText("📴 Offline Mode - Trip will sync when online");
+                tvOfflineIndicator.setText("Offline Mode - Trip will sync when online");
             } else {
                 tvOfflineIndicator.setVisibility(TextView.GONE);
             }
@@ -254,11 +297,78 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
+        // Draw route markers and line immediately if coordinates available
+        drawRouteOnMap();
+
         if (checkLocationPermission()) {
             mMap.setMyLocationEnabled(true);
             startTracking();
         } else {
             requestLocationPermission();
+        }
+    }
+
+    // Draw start marker, end marker, and route line on map
+
+    private void drawRouteOnMap() {
+        if (mMap == null) return;
+
+        // Add start marker (green)
+        if (routeOriginLatLng != null) {
+            mMap.addMarker(new MarkerOptions()
+                    .position(routeOriginLatLng)
+                    .title("Start: " + (startName != null ? startName : "Origin"))
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+            Log.d(TAG, "Added start marker at " + routeOriginLatLng);
+        }
+
+        // Add end marker (red)
+        if (routeDestLatLng != null) {
+            mMap.addMarker(new MarkerOptions()
+                    .position(routeDestLatLng)
+                    .title("End: " + (endName != null ? endName : "Destination"))
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+            Log.d(TAG, "Added end marker at " + routeDestLatLng);
+        }
+
+        //  Draw road-following polyline if available, otherwise straight line
+        if (!routePolylinePoints.isEmpty()) {
+            // Draw the actual road path (blue, follows roads)
+            mMap.addPolyline(new PolylineOptions()
+                    .addAll(routePolylinePoints)
+                    .width(8)
+                    .color(Color.parseColor("#2196F3"))  // Blue
+                    .geodesic(true));
+            Log.d(TAG, "Drew road-following route with " + routePolylinePoints.size() + " points");
+        } else if (routeOriginLatLng != null && routeDestLatLng != null) {
+            // Fallback: straight line between start and end
+            mMap.addPolyline(new PolylineOptions()
+                    .add(routeOriginLatLng, routeDestLatLng)
+                    .width(8)
+                    .color(Color.parseColor("#2196F3"))  // Blue
+                    .geodesic(true));
+            Log.d(TAG, "Drew straight line route (polyline not yet loaded)");
+        }
+
+        // Zoom to show route
+        if (routeOriginLatLng != null && routeDestLatLng != null) {
+            LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+            boundsBuilder.include(routeOriginLatLng);
+            boundsBuilder.include(routeDestLatLng);
+
+            try {
+                LatLngBounds bounds = boundsBuilder.build();
+                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
+            } catch (Exception e) {
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(routeOriginLatLng, 14));
+            }
+
+            // Start following driver after 5 seconds
+            followHandler.postDelayed(() -> {
+                shouldFollowDriver = true;
+                Log.d(TAG, "Now following driver location");
+            }, 5000);
+
         }
     }
 
@@ -306,7 +416,7 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
             fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
         }
 
-        // Fetch route distance from Google Directions API
+        // Fetch route distance and polyline from Google Directions API
         if (!isOffline && endName != null) {
             fetchRouteDistance();
         }
@@ -390,7 +500,33 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                             Log.d(TAG, "Route distance: " + totalRouteDistanceKm + " km");
 
-                            runOnUiThread(this::updateRouteProgress);
+                            // NEW: Extract and decode the polyline
+                            if (route.has("overview_polyline")) {
+                                JSONObject overviewPolyline = route.getJSONObject("overview_polyline");
+                                String encodedPolyline = overviewPolyline.getString("points");
+                                List<LatLng> decodedPoints = decodePolyline(encodedPolyline);
+
+                                if (!decodedPoints.isEmpty()) {
+                                    routePolylinePoints = decodedPoints;
+                                    Log.d(TAG, "Decoded polyline with " + routePolylinePoints.size() + " points");
+                                }
+                            }
+
+                            runOnUiThread(() -> {
+                                updateRouteProgress();
+                                // Redraw map with road-following route
+                                if (mMap != null && !routePolylinePoints.isEmpty()) {
+                                    mMap.clear();
+                                    drawRouteOnMap();
+                                    // Redraw driver's path if any
+                                    if (tripPoints.size() > 1) {
+                                        mMap.addPolyline(new PolylineOptions()
+                                                .addAll(tripPoints)
+                                                .width(10)
+                                                .color(getResources().getColor(R.color.primary, null)));
+                                    }
+                                }
+                            });
                         }
                     }
                 } else {
@@ -402,6 +538,40 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
                 runOnUiThread(this::estimateRouteDistance);
             }
         });
+    }
+
+    // Decode an encoded polyline string into a list of LatLng points
+
+    private List<LatLng> decodePolyline(String encoded) {
+        List<LatLng> poly = new ArrayList<>();
+        int index = 0, len = encoded.length();
+        int lat = 0, lng = 0;
+
+        while (index < len) {
+            int b, shift = 0, result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lat += dlat;
+
+            shift = 0;
+            result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lng += dlng;
+
+            LatLng p = new LatLng((double) lat / 1E5, (double) lng / 1E5);
+            poly.add(p);
+        }
+
+        return poly;
     }
 
     private String getApiKeyFromManifest() {
@@ -476,18 +646,54 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Update route progress
         updateRouteProgress();
 
-        // Move camera
+        // Update map with route markers and trip path
         if (mMap != null) {
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newPoint, 16));
+            mMap.clear();
 
+            // Re-draw route markers (green start, red end)
+            if (routeOriginLatLng != null) {
+                mMap.addMarker(new MarkerOptions()
+                        .position(routeOriginLatLng)
+                        .title("Start: " + (startName != null ? startName : "Origin"))
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+            }
+
+            if (routeDestLatLng != null) {
+                mMap.addMarker(new MarkerOptions()
+                        .position(routeDestLatLng)
+                        .title("End: " + (endName != null ? endName : "Destination"))
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+            }
+
+            // Draw road-following route if available, otherwise straight line
+            if (!routePolylinePoints.isEmpty()) {
+                // Draw actual road path (light blue)
+                mMap.addPolyline(new PolylineOptions()
+                        .addAll(routePolylinePoints)
+                        .width(6)
+                        .color(Color.parseColor("#90CAF9"))  // Light blue
+                        .geodesic(true));
+            } else if (routeOriginLatLng != null && routeDestLatLng != null) {
+                // Fallback: straight line
+                mMap.addPolyline(new PolylineOptions()
+                        .add(routeOriginLatLng, routeDestLatLng)
+                        .width(6)
+                        .color(Color.parseColor("#90CAF9"))  // Light blue
+                        .geodesic(true));
+            }
+
+            // Draw driver's actual path (primary color, thicker)
             if (tripPoints.size() > 1) {
-                mMap.clear();
                 mMap.addPolyline(new PolylineOptions()
                         .addAll(tripPoints)
                         .width(10)
                         .color(getResources().getColor(R.color.primary, null)));
             }
-        }
+
+            // Move camera to follow driver (only after initial delay)
+            if (shouldFollowDriver) {
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newPoint, 16));
+            }        }
     }
 
     private void updateRouteProgress() {
@@ -610,7 +816,7 @@ public class TripActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         if (isOffline || !NetworkUtils.isNetworkAvailable(this)) {
             offlineManager.saveTripOffline(request);
-            Toast.makeText(this, "📴 Trip saved offline - will sync when online", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Trip saved offline - will sync when online", Toast.LENGTH_LONG).show();
             openTripSummary(durationMinutes, true);
             return;
         }

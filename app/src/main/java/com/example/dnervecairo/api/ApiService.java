@@ -1,6 +1,7 @@
 package com.example.dnervecairo.api;
 
 import com.example.dnervecairo.api.requests.DriverRegistration;
+import com.example.dnervecairo.api.requests.ETARequest;
 import com.example.dnervecairo.api.requests.TripSubmission;
 import com.example.dnervecairo.api.requests.WithdrawalRequest;
 import com.example.dnervecairo.api.responses.DocumentUploadResponse;
@@ -8,6 +9,7 @@ import com.example.dnervecairo.api.responses.DocumentsStatusResponse;
 import com.example.dnervecairo.api.responses.DriverResponse;
 import com.example.dnervecairo.api.responses.DriversListResponse;
 import com.example.dnervecairo.api.responses.DriverScoreResponse;
+import com.example.dnervecairo.api.responses.ETAResponse;
 import com.example.dnervecairo.api.responses.LeaderboardResponse;
 import com.example.dnervecairo.api.responses.PointsHistoryResponse;
 import com.example.dnervecairo.api.responses.RouteResponse;
@@ -133,6 +135,10 @@ public interface ApiService {
             @Path("document_type") String documentType
     );
 
+    // ========== ETA PREDICTION ==========
+
+    @POST("predict-eta/simple")
+    Call<ETAResponse> predictETA(@Body ETARequest request);
 
     // ========== SYSTEM ==========
 

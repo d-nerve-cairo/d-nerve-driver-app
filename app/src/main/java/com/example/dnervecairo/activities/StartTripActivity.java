@@ -9,9 +9,8 @@ import android.location.Location;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +23,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.dnervecairo.R;
 import com.example.dnervecairo.adapters.PopularRoutesAdapter;
 import com.example.dnervecairo.api.ApiClient;
+import com.example.dnervecairo.api.requests.ETARequest;
+import com.example.dnervecairo.api.responses.ETAResponse;
 import com.example.dnervecairo.api.responses.RouteResponse;
 import com.example.dnervecairo.models.PopularRoute;
 import com.example.dnervecairo.utils.NetworkUtils;
@@ -37,6 +38,7 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -46,10 +48,12 @@ import retrofit2.Response;
 
 public class StartTripActivity extends AppCompatActivity {
 
+    private static final String TAG = "StartTripActivity";
     private static final int LOCATION_PERMISSION_REQUEST = 1001;
 
     // UI Elements
     private TextView tvCurrentLocation;
+    private TextView tvPredictedETA;  // Show ML prediction
     private TextInputEditText etStartLocation, etDestination;
     private RecyclerView rvPopularRoutes;
     private MaterialButton btnStartTrip;
@@ -66,6 +70,14 @@ public class StartTripActivity extends AppCompatActivity {
     private String selectedRouteName = null;
     private String startLocationName = "";
     private String destinationName = "";
+    private float selectedRouteDistance = 0;  // Store route distance
+    private int predictedETAMinutes = 0;      // Store ML prediction
+
+    // Route coordinates for map display
+    private double routeOriginLat = 0;
+    private double routeOriginLon = 0;
+    private double routeDestLat = 0;
+    private double routeDestLon = 0;
 
     private PreferenceManager prefManager;
 
@@ -86,6 +98,7 @@ public class StartTripActivity extends AppCompatActivity {
 
     private void initViews() {
         tvCurrentLocation = findViewById(R.id.tv_current_location);
+        tvPredictedETA = findViewById(R.id.tv_predicted_eta);  // NEW
         etStartLocation = findViewById(R.id.et_start_location);
         etDestination = findViewById(R.id.et_destination);
         rvPopularRoutes = findViewById(R.id.rv_popular_routes);
@@ -94,6 +107,11 @@ public class StartTripActivity extends AppCompatActivity {
         progressLoading = findViewById(R.id.progress_loading);
 
         rvPopularRoutes.setLayoutManager(new LinearLayoutManager(this));
+
+        // Hide ETA initially
+        if (tvPredictedETA != null) {
+            tvPredictedETA.setVisibility(View.GONE);
+        }
     }
 
     private void setupToolbar() {
@@ -150,11 +168,79 @@ public class StartTripActivity extends AppCompatActivity {
         btnStartTrip.setEnabled(canStart);
 
         if (canStart) {
-            btnStartTrip.setText("Start Trip: " + startLocationName + " → " + destinationName);
+            String buttonText = "Start Trip: " + startLocationName + " → " + destinationName;
+            if (predictedETAMinutes > 0) {
+                buttonText += " (~" + predictedETAMinutes + " min)";
+            }
+            btnStartTrip.setText(buttonText);
         } else {
             btnStartTrip.setText("Select Route to Start");
         }
     }
+
+    // =========================================================================
+    // ML ETA PREDICTION
+    // =========================================================================
+
+    private void fetchPredictedETA(float distanceKm, int fallbackMinutes) {
+        // Determine if peak hour (7-9 AM or 5-8 PM)
+        int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+        int isPeak = ((hour >= 7 && hour <= 9) || (hour >= 17 && hour <= 20)) ? 1 : 0;
+
+        Log.d(TAG, "Fetching ML ETA: distance=" + distanceKm + "km, hour=" + hour + ", isPeak=" + isPeak);
+
+        ETARequest request = new ETARequest(distanceKm, hour, isPeak);
+
+        ApiClient.getInstance().getApiService()
+                .predictETA(request)
+                .enqueue(new Callback<ETAResponse>() {
+                    @Override
+                    public void onResponse(@NonNull Call<ETAResponse> call,
+                                           @NonNull Response<ETAResponse> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            float eta = response.body().getPredictedDurationMinutes();
+                            predictedETAMinutes = Math.round(eta);
+
+                            Log.d(TAG, "ML ETA prediction: " + predictedETAMinutes + " min");
+
+                            // Update UI with ML-predicted ETA
+                            showPredictedETA(predictedETAMinutes, true);
+                            updateStartButton();
+                        } else {
+                            // Use fallback
+                            predictedETAMinutes = fallbackMinutes;
+                            showPredictedETA(fallbackMinutes, false);
+                            updateStartButton();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<ETAResponse> call, @NonNull Throwable t) {
+                        Log.w(TAG, "ML prediction failed: " + t.getMessage());
+                        // Use fallback
+                        predictedETAMinutes = fallbackMinutes;
+                        showPredictedETA(fallbackMinutes, false);
+                        updateStartButton();
+                    }
+                });
+    }
+
+    private void showPredictedETA(int minutes, boolean isMLPrediction) {
+        if (tvPredictedETA != null) {
+            if (isMLPrediction) {
+                tvPredictedETA.setText("AI Predicted ETA: " + minutes + " min");
+                tvPredictedETA.setTextColor(getResources().getColor(R.color.primary, null));
+            } else {
+                tvPredictedETA.setText("Estimated: " + minutes + " min");
+                tvPredictedETA.setTextColor(getResources().getColor(R.color.text_secondary, null));
+            }
+            tvPredictedETA.setVisibility(View.VISIBLE);
+        }
+    }
+
+    // =========================================================================
+    // LOCATION
+    // =========================================================================
 
     private void getCurrentLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -215,6 +301,10 @@ public class StartTripActivity extends AppCompatActivity {
         }
     }
 
+    // =========================================================================
+    // ROUTES LOADING
+    // =========================================================================
+
     private void loadPopularRoutes() {
         if (!NetworkUtils.isNetworkAvailable(this)) {
             loadOfflineRoutes();
@@ -250,13 +340,22 @@ public class StartTripActivity extends AppCompatActivity {
         List<PopularRoute> popularRoutes = new ArrayList<>();
 
         for (RouteResponse route : routes) {
-            popularRoutes.add(new PopularRoute(
+            PopularRoute pr = new PopularRoute(
                     route.getRouteId(),
                     route.getStartName(),
                     route.getEndName(),
                     route.getEstimatedDuration(),
                     route.getPopularity()
-            ));
+            );
+            pr.setDistanceKm(route.getDistanceKm());  // Store distance for ETA
+
+            // NEW: Store coordinates from API response
+            pr.setOriginLat(route.getOriginLat());
+            pr.setOriginLon(route.getOriginLon());
+            pr.setDestLat(route.getDestLat());
+            pr.setDestLon(route.getDestLon());
+
+            popularRoutes.add(pr);
         }
 
         PopularRoutesAdapter adapter = new PopularRoutesAdapter(popularRoutes, route -> {
@@ -265,9 +364,28 @@ public class StartTripActivity extends AppCompatActivity {
             selectedRouteName = route.getStartName() + " → " + route.getEndName();
             startLocationName = route.getStartName();
             destinationName = route.getEndName();
+            selectedRouteDistance = route.getDistanceKm();
+
+            // NEW: Store route coordinates for map
+            routeOriginLat = route.getOriginLat();
+            routeOriginLon = route.getOriginLon();
+            routeDestLat = route.getDestLat();
+            routeDestLon = route.getDestLon();
+
+            Log.d(TAG, "Selected route: " + selectedRouteName);
+            Log.d(TAG, "Coordinates: (" + routeOriginLat + "," + routeOriginLon + ") -> (" + routeDestLat + "," + routeDestLon + ")");
 
             etStartLocation.setText(route.getStartName());
             etDestination.setText(route.getEndName());
+
+            // Fetch ML-predicted ETA
+            if (selectedRouteDistance > 0) {
+                fetchPredictedETA(selectedRouteDistance, route.getEstimatedMinutes());
+            } else {
+                // Fallback: estimate distance from duration (assume 20 km/h average)
+                float estimatedDistance = route.getEstimatedMinutes() * 20f / 60f;
+                fetchPredictedETA(estimatedDistance, route.getEstimatedMinutes());
+            }
 
             updateStartButton();
         });
@@ -276,28 +394,47 @@ public class StartTripActivity extends AppCompatActivity {
     }
 
     private void loadOfflineRoutes() {
-        // Show some common Cairo routes as fallback
+        // Show some common Cairo routes as fallback - NOW WITH COORDINATES
         List<PopularRoute> defaultRoutes = new ArrayList<>();
-        defaultRoutes.add(new PopularRoute("route_1", "Ramses", "Giza", 45, 85));
-        defaultRoutes.add(new PopularRoute("route_2", "Tahrir", "Maadi", 35, 72));
-        defaultRoutes.add(new PopularRoute("route_3", "Heliopolis", "Downtown", 40, 68));
-        defaultRoutes.add(new PopularRoute("route_4", "Nasr City", "Mohandessin", 50, 55));
-        defaultRoutes.add(new PopularRoute("route_5", "Shubra", "Zamalek", 30, 45));
+        defaultRoutes.add(new PopularRoute("route_1", "Ramses", "Giza", 45, 85, 15f,
+                30.0619, 31.2466, 30.0131, 31.2089));
+        defaultRoutes.add(new PopularRoute("route_2", "Tahrir", "Maadi", 35, 72, 12f,
+                30.0444, 31.2357, 29.9602, 31.2569));
+        defaultRoutes.add(new PopularRoute("route_3", "Heliopolis", "Downtown", 40, 68, 8.5f,
+                30.0866, 31.3225, 30.0459, 31.2394));
+        defaultRoutes.add(new PopularRoute("route_4", "Nasr City", "Mohandessin", 50, 55, 15f,
+                30.0511, 31.3656, 30.0609, 31.2003));
+        defaultRoutes.add(new PopularRoute("route_5", "Shubra", "Zamalek", 30, 45, 6f,
+                30.0986, 31.2422, 30.0609, 31.2194));
 
         PopularRoutesAdapter adapter = new PopularRoutesAdapter(defaultRoutes, route -> {
             selectedRouteId = route.getRouteId();
             selectedRouteName = route.getStartName() + " → " + route.getEndName();
             startLocationName = route.getStartName();
             destinationName = route.getEndName();
+            selectedRouteDistance = route.getDistanceKm();
+
+            // NEW: Store route coordinates for map
+            routeOriginLat = route.getOriginLat();
+            routeOriginLon = route.getOriginLon();
+            routeDestLat = route.getDestLat();
+            routeDestLon = route.getDestLon();
 
             etStartLocation.setText(route.getStartName());
             etDestination.setText(route.getEndName());
+
+            // Fetch ML-predicted ETA
+            fetchPredictedETA(selectedRouteDistance, route.getEstimatedMinutes());
 
             updateStartButton();
         });
 
         rvPopularRoutes.setAdapter(adapter);
     }
+
+    // =========================================================================
+    // START TRIP
+    // =========================================================================
 
     private void startTrip() {
         if (startLocationName.trim().isEmpty() || destinationName.trim().isEmpty()) {
@@ -312,6 +449,18 @@ public class StartTripActivity extends AppCompatActivity {
         intent.putExtra(TripActivity.EXTRA_END_NAME, destinationName);
         intent.putExtra(TripActivity.EXTRA_START_LAT, currentLat);
         intent.putExtra(TripActivity.EXTRA_START_LNG, currentLng);
+        intent.putExtra("predicted_eta", predictedETAMinutes);  // Pass to TripActivity
+
+        // NEW: Pass route coordinates for map display
+        intent.putExtra("route_origin_lat", routeOriginLat);
+        intent.putExtra("route_origin_lon", routeOriginLon);
+        intent.putExtra("route_dest_lat", routeDestLat);
+        intent.putExtra("route_dest_lon", routeDestLon);
+        intent.putExtra("route_distance_km", selectedRouteDistance);
+
+        Log.d(TAG, "Starting trip with coordinates: origin(" + routeOriginLat + "," + routeOriginLon +
+                ") dest(" + routeDestLat + "," + routeDestLon + ")");
+
         startActivity(intent);
         finish();
     }

@@ -96,6 +96,17 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- ETA TextView -->
+            <TextView
+                android:id="@+id/tv_predicted_eta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                android:text="🤖 AI Predicted ETA: -- min" />
+
             <!-- Route Input Section -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
