@@ -19,6 +19,13 @@ public class PreferenceManager {
     private static final String KEY_DRIVER_VEHICLE_TYPE = "driver_vehicle_type";
     private static final String KEY_DRIVER_PLATE = "driver_plate";
     private static final String KEY_MEMBER_SINCE = "member_since";
+    private static final String KEY_SAVED_EMAIL = "saved_email";
+
+    // Live Trip Mode keys
+    private static final String KEY_LIVE_MODE_ENABLED = "live_mode_enabled";
+    private static final String KEY_ACTIVE_TRIP_ID = "active_trip_id";
+    private static final String KEY_ACTIVE_TRIP_ROUTE_ID = "active_trip_route_id";
+    private static final String KEY_ACTIVE_TRIP_START_TIME = "active_trip_start_time";
 
     private final SharedPreferences prefs;
 
@@ -133,6 +140,99 @@ public class PreferenceManager {
         saveDriverName("Test Driver");
         setLoggedIn(true);
     }
+
+    public void saveEmail(String email) {
+        prefs.edit().putString(KEY_SAVED_EMAIL, email).apply();
+    }
+
+    public String getSavedEmail() {
+        return prefs.getString(KEY_SAVED_EMAIL, "");
+    }
+
+    public void clearSavedEmail() {
+        prefs.edit().remove(KEY_SAVED_EMAIL).apply();
+    }
+
+    // FCM Token
+    private static final String KEY_FCM_TOKEN = "fcm_token";
+
+    public void saveFcmToken(String token) {
+        prefs.edit().putString(KEY_FCM_TOKEN, token).apply();
+    }
+
+    public String getFcmToken() {
+        return prefs.getString(KEY_FCM_TOKEN, null);
+    }
+
+    // ========== LIVE TRIP MODE ==========
+
+    /**
+     * Enable or disable live trip mode (real-time GPS streaming)
+     * When disabled, falls back to batch mode (GPS sent at trip end)
+     */
+    public void setLiveModeEnabled(boolean enabled) {
+        prefs.edit().putBoolean(KEY_LIVE_MODE_ENABLED, enabled).apply();
+    }
+
+    /**
+     * Check if live trip mode is enabled
+     * Default: true (live mode is the default for new installs)
+     */
+    public boolean isLiveModeEnabled() {
+        return prefs.getBoolean(KEY_LIVE_MODE_ENABLED, true);
+    }
+
+    /**
+     * Save active trip data for crash/restart recovery
+     */
+    public void saveActiveTripData(String tripId, String routeId, long startTime) {
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(KEY_ACTIVE_TRIP_ID, tripId);
+        editor.putString(KEY_ACTIVE_TRIP_ROUTE_ID, routeId);
+        editor.putLong(KEY_ACTIVE_TRIP_START_TIME, startTime);
+        editor.apply();
+    }
+
+    /**
+     * Get the active trip ID (if app was killed mid-trip)
+     */
+    public String getActiveTripId() {
+        return prefs.getString(KEY_ACTIVE_TRIP_ID, null);
+    }
+
+    /**
+     * Get the active trip's route ID
+     */
+    public String getActiveTripRouteId() {
+        return prefs.getString(KEY_ACTIVE_TRIP_ROUTE_ID, null);
+    }
+
+    /**
+     * Get the active trip's start time
+     */
+    public long getActiveTripStartTime() {
+        return prefs.getLong(KEY_ACTIVE_TRIP_START_TIME, 0);
+    }
+
+    /**
+     * Check if there's an active trip that needs recovery
+     */
+    public boolean hasActiveTripId() {
+        return prefs.getString(KEY_ACTIVE_TRIP_ID, null) != null;
+    }
+
+    /**
+     * Clear active trip data (call when trip ends normally)
+     */
+    public void clearActiveTripData() {
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.remove(KEY_ACTIVE_TRIP_ID);
+        editor.remove(KEY_ACTIVE_TRIP_ROUTE_ID);
+        editor.remove(KEY_ACTIVE_TRIP_START_TIME);
+        editor.apply();
+    }
+
+    // ========== CLEAR ALL ==========
 
     public void clear() {
         prefs.edit().clear().apply();

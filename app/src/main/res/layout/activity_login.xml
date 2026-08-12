@@ -21,14 +21,14 @@
             android:layout_marginTop="48dp"
             android:src="@drawable/ic_directions_bus"
             app:tint="@color/primary"
-            android:contentDescription="D-Nerve Logo"/>
+            android:contentDescription="@string/app_name"/>
 
         <!-- App Name -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="D-Nerve Driver"
+            android:text="@string/app_name"
             android:textSize="28sp"
             android:textStyle="bold"
             android:textColor="@color/primary"/>
@@ -38,7 +38,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Drive. Earn. Reward."
+            android:text="@string/app_tagline"
             android:textAppearance="@style/TextAppearance.DNerve.Body2"/>
 
         <!-- Login Card -->
@@ -59,33 +59,97 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Welcome Back"
+                    android:text="@string/auth_welcome_back"
                     android:textAppearance="@style/TextAppearance.DNerve.H3"
                     android:layout_marginBottom="24dp"/>
 
-                <!-- Phone Input -->
+                <!-- Email Input -->
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Phone Number"
+                    android:hint="@string/auth_email"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    app:startIconDrawable="@drawable/ic_phone"
-                    android:layout_marginBottom="16dp">
+                    app:startIconDrawable="@drawable/ic_email"
+                    app:errorEnabled="true"
+                    android:layout_marginBottom="8dp">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/et_phone"
+                        android:id="@+id/et_email"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="phone"
-                        android:maxLength="15"/>
+                        android:inputType="textEmailAddress"
+                        android:maxLines="1"
+                        android:imeOptions="actionNext"
+                        android:importantForAccessibility="yes"/>
                 </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Password Input with proper toggle -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/auth_password"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    app:startIconDrawable="@drawable/ic_lock"
+                    app:endIconMode="password_toggle"
+                    app:errorEnabled="true"
+                    android:layout_marginBottom="8dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_password"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:maxLines="1"
+                        android:imeOptions="actionDone"
+                        android:importantForAccessibility="yes"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Remember Me & Forgot Password Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <CheckBox
+                        android:id="@+id/cb_remember_me"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/auth_remember_me"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_secondary"
+                        android:minHeight="48dp"/>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"/>
+
+                    <!-- Forgot password with proper touch target -->
+                    <TextView
+                        android:id="@+id/tv_forgot_password"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minWidth="48dp"
+                        android:minHeight="48dp"
+                        android:gravity="center"
+                        android:text="@string/auth_forgot_password"
+                        android:textSize="14sp"
+                        android:textColor="@color/primary"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackgroundBorderless"/>
+                </LinearLayout>
 
                 <!-- Login Button -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_login"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:text="Login"
+                    android:text="@string/auth_login"
                     android:textSize="16sp"
                     app:cornerRadius="28dp"/>
 
@@ -107,21 +171,29 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="24dp"
-            android:layout_marginBottom="24dp">
+            android:layout_marginBottom="24dp"
+            android:gravity="center_vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Don't have an account? "
+                android:text="@string/auth_no_account"
                 android:textAppearance="@style/TextAppearance.DNerve.Body2"/>
 
             <TextView
                 android:id="@+id/tv_register"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Register"
+                android:layout_marginStart="4dp"
+                android:minWidth="48dp"
+                android:minHeight="48dp"
+                android:gravity="center"
+                android:text="@string/auth_sign_up"
                 android:textColor="@color/primary"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
         </LinearLayout>
 
     </LinearLayout>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,160 +7,204 @@
     android:layout_height="match_parent"
     android:background="@color/background">
 
-    <!-- Offline Indicator -->
+    <!-- Offline Indicator - Fixed at top -->
     <TextView
         android:id="@+id/tv_offline_indicator"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#FFF3E0"
-        android:padding="8dp"
+        android:padding="10dp"
         android:text="📴 Offline Mode - Trip will sync when online"
         android:textColor="#E65100"
         android:textAlignment="center"
-        android:textSize="12sp"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
 
-    <!-- Route Header Card -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_route_header"
+    <!-- Main Content Area -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="4dp"
-        app:cardBackgroundColor="@color/primary"
-        app:layout_constraintTop_toBottomOf="@id/tv_offline_indicator">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <LinearLayout
+        <!-- Route Header Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_route_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="12dp">
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="@color/primary">
 
-            <!-- Route Name -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:orientation="vertical"
+                android:padding="16dp">
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_directions_bus"
-                    app:tint="@android:color/white"
-                    android:contentDescription="Bus" />
-
-                <TextView
-                    android:id="@+id/tv_route_name"
-                    android:layout_width="0dp"
+                <!-- Route Name Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    android:text="Ramses → Giza"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/white"
-                    android:ellipsize="end"
-                    android:maxLines="1" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_directions_bus"
+                        app:tint="@android:color/white"
+                        android:contentDescription="Route" />
+
+                    <TextView
+                        android:id="@+id/tv_route_name"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="10dp"
+                        android:text="Ramses → Giza"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white"
+                        android:ellipsize="end"
+                        android:maxLines="1" />
+
+                    <TextView
+                        android:id="@+id/tv_eta"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ETA: 25m"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary"
+                        android:background="@drawable/bg_eta_chip"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="6dp" />
+
+                </LinearLayout>
+
+                <!-- Current Area -->
                 <TextView
-                    android:id="@+id/tv_eta"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tv_current_area"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="ETA: 25m"
-                    android:textSize="14sp"
-                    android:textColor="@android:color/white"
-                    android:background="@drawable/bg_eta_chip"
-                    android:paddingHorizontal="10dp"
-                    android:paddingVertical="4dp" />
+                    android:layout_marginTop="6dp"
+                    android:text="📍 Starting trip..."
+                    android:textSize="13sp"
+                    android:textColor="#B3FFFFFF"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+
+                <!-- Progress Bar -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="12dp">
+
+                    <com.google.android.material.progressindicator.LinearProgressIndicator
+                        android:id="@+id/progress_route"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        app:trackThickness="10dp"
+                        app:trackCornerRadius="5dp"
+                        app:indicatorColor="@android:color/white"
+                        app:trackColor="#4DFFFFFF" />
+
+                    <TextView
+                        android:id="@+id/tv_progress_percent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:text="0%"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
-            <!-- Progress Bar -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginTop="8dp">
+        </com.google.android.material.card.MaterialCardView>
 
-                <com.google.android.material.progressindicator.LinearProgressIndicator
-                    android:id="@+id/progress_route"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    app:trackThickness="8dp"
-                    app:trackCornerRadius="4dp"
-                    app:indicatorColor="@android:color/white"
-                    app:trackColor="#4DFFFFFF" />
+        <!-- Map - Takes remaining space -->
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:layout="@layout/fragment_map_placeholder" />
 
-                <TextView
-                    android:id="@+id/tv_progress_percent"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="0%"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/white" />
+    </LinearLayout>
 
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- Map -->
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/card_route_header"
-        app:layout_constraintBottom_toTopOf="@id/bottom_card"
-        tools:layout="@layout/fragment_map_placeholder" />
-
-    <!-- Bottom Card -->
+    <!-- Bottom Sheet Card - Draggable -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/bottom_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="8dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        app:behavior_peekHeight="280dp"
+        app:behavior_hideable="false"
+        app:cardCornerRadius="28dp"
+        app:cardElevation="16dp"
         app:cardBackgroundColor="@color/surface">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp"
-            android:gravity="center_horizontal">
+            android:paddingBottom="24dp">
 
-            <!-- Timer -->
-            <TextView
-                android:id="@+id/tv_timer"
-                android:layout_width="wrap_content"
+            <!-- Drag Handle - Swipe indicator -->
+            <View
+                android:id="@+id/drag_handle"
+                android:layout_width="40dp"
+                android:layout_height="4dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/bg_drag_handle" />
+
+            <!-- Timer Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="00:00:00"
-                android:textSize="42sp"
-                android:textStyle="bold"
-                android:textColor="@color/text_primary" />
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:paddingHorizontal="20dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Trip Duration"
-                android:textAppearance="@style/TextAppearance.DNerve.Caption"
-                android:layout_marginBottom="16dp" />
+                <TextView
+                    android:id="@+id/tv_timer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="00:00:00"
+                    android:textSize="48sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.05" />
 
-            <!-- Distance Row -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/trip_duration"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_secondary"
+                    android:layout_marginBottom="16dp" />
+
+            </LinearLayout>
+
+            <!-- Stats Grid - Row 1 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:paddingHorizontal="20dp"
                 android:layout_marginBottom="12dp"
                 android:baselineAligned="false">
 
@@ -170,22 +214,26 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:background="@drawable/bg_stat_card"
+                    android:padding="12dp"
+                    android:layout_marginEnd="6dp">
 
                     <TextView
                         android:id="@+id/tv_distance"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0.0 km"
-                        android:textSize="18sp"
+                        android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="@color/primary" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Traveled"
-                        android:textAppearance="@style/TextAppearance.DNerve.Caption" />
+                        android:text="@string/traveled"
+                        android:textSize="11sp"
+                        android:textColor="@color/text_secondary" />
                 </LinearLayout>
 
                 <!-- Remaining -->
@@ -194,22 +242,26 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:background="@drawable/bg_stat_card"
+                    android:padding="12dp"
+                    android:layout_marginHorizontal="6dp">
 
                     <TextView
                         android:id="@+id/tv_remaining_distance"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="-- km"
-                        android:textSize="18sp"
+                        android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="@color/accent" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Remaining"
-                        android:textAppearance="@style/TextAppearance.DNerve.Caption" />
+                        android:text="@string/remaining"
+                        android:textSize="11sp"
+                        android:textColor="@color/text_secondary" />
                 </LinearLayout>
 
                 <!-- Speed -->
@@ -218,31 +270,36 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:background="@drawable/bg_stat_card"
+                    android:padding="12dp"
+                    android:layout_marginStart="6dp">
 
                     <TextView
                         android:id="@+id/tv_speed"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0 km/h"
-                        android:textSize="18sp"
+                        android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="@color/text_primary" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Speed"
-                        android:textAppearance="@style/TextAppearance.DNerve.Caption" />
+                        android:text="@string/speed"
+                        android:textSize="11sp"
+                        android:textColor="@color/text_secondary" />
                 </LinearLayout>
 
             </LinearLayout>
 
-            <!-- Stats Row -->
+            <!-- Stats Grid - Row 2 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:paddingHorizontal="20dp"
                 android:layout_marginBottom="16dp"
                 android:baselineAligned="false">
 
@@ -252,22 +309,26 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:background="@drawable/bg_stat_card"
+                    android:padding="12dp"
+                    android:layout_marginEnd="6dp">
 
                     <TextView
                         android:id="@+id/tv_gps_points"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0"
-                        android:textSize="18sp"
+                        android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="@color/success" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="GPS Points"
-                        android:textAppearance="@style/TextAppearance.DNerve.Caption" />
+                        android:text="@string/gps_points"
+                        android:textSize="11sp"
+                        android:textColor="@color/text_secondary" />
                 </LinearLayout>
 
                 <!-- GPS Status -->
@@ -276,22 +337,49 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:background="@drawable/bg_stat_card"
+                    android:padding="12dp"
+                    android:layout_marginHorizontal="6dp">
 
-                    <ImageView
-                        android:id="@+id/iv_gps_status"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_my_location"
-                        android:contentDescription="GPS Status"
-                        app:tint="@color/success" />
+                    <!-- GPS with pulse -->
+                    <FrameLayout
+                        android:layout_width="28dp"
+                        android:layout_height="28dp">
+
+                        <View
+                            android:id="@+id/view_gps_pulse"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:background="@drawable/bg_circle_success"
+                            android:alpha="0.5" />
+
+                        <ImageView
+                            android:id="@+id/iv_gps_status"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_my_location"
+                            android:contentDescription="GPS"
+                            app:tint="@color/success" />
+                    </FrameLayout>
 
                     <TextView
                         android:id="@+id/tv_gps_status"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="GPS Active"
-                        android:textAppearance="@style/TextAppearance.DNerve.Caption"
+                        android:textSize="10sp"
+                        android:textColor="@color/success"
+                        android:layout_marginTop="2dp" />
+
+                    <TextView
+                        android:id="@+id/tv_gps_quality"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Excellent"
+                        android:textSize="9sp"
+                        android:textStyle="bold"
                         android:textColor="@color/success" />
                 </LinearLayout>
 
@@ -301,22 +389,26 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:background="@drawable/bg_stat_card"
+                    android:padding="12dp"
+                    android:layout_marginStart="6dp">
 
                     <TextView
                         android:id="@+id/tv_estimated_points"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="+0 pts"
-                        android:textSize="18sp"
+                        android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="@color/warning" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Est. Points"
-                        android:textAppearance="@style/TextAppearance.DNerve.Caption" />
+                        android:text="@string/est_points"
+                        android:textSize="11sp"
+                        android:textColor="@color/text_secondary" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -325,9 +417,12 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
+                app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/divider"
                 app:cardBackgroundColor="@color/background">
 
                 <LinearLayout
@@ -335,57 +430,71 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:padding="12dp">
+                    android:padding="14dp">
 
                     <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
                         android:src="@drawable/ic_people"
-                        app:tint="@color/text_secondary"
-                        android:contentDescription="Passengers" />
+                        app:tint="@color/primary"
+                        android:contentDescription="@string/passengers" />
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginStart="8dp"
-                        android:text="Passengers"
+                        android:layout_marginStart="12dp"
+                        android:text="@string/passengers"
                         android:textSize="16sp"
-                        android:textColor="@color/text_primary" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_passenger_minus"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        android:padding="0dp"
-                        android:text="-"
-                        android:textSize="20sp"
-                        app:cornerRadius="20dp" />
-
-                    <TextView
-                        android:id="@+id/tv_passenger_count"
-                        android:layout_width="48dp"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="0"
-                        android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="@color/text_primary" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_passenger_plus"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        android:padding="0dp"
-                        android:text="+"
-                        android:textSize="20sp"
-                        app:cornerRadius="20dp" />
+                    <!-- Counter -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="@drawable/bg_counter"
+                        android:padding="4dp">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_passenger_minus"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:padding="0dp"
+                            android:text="−"
+                            android:textSize="24sp"
+                            android:textColor="@color/text_primary"
+                            app:rippleColor="@color/primary_light" />
+
+                        <TextView
+                            android:id="@+id/tv_passenger_count"
+                            android:layout_width="48dp"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="1"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/primary" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_passenger_plus"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:padding="0dp"
+                            android:text="+"
+                            android:textSize="24sp"
+                            android:textColor="@color/text_primary"
+                            app:rippleColor="@color/primary_light" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -395,15 +504,19 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_stop_trip"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="60dp"
+                android:layout_marginHorizontal="20dp"
                 android:text="@string/trip_stop"
-                android:textSize="16sp"
+                android:textSize="18sp"
+                android:textStyle="bold"
                 app:icon="@drawable/ic_stop_circle"
                 app:iconGravity="textStart"
-                app:cornerRadius="28dp"
-                android:backgroundTint="@color/error" />
+                app:iconSize="24dp"
+                app:cornerRadius="30dp"
+                android:backgroundTint="@color/error"
+                app:elevation="6dp" />
 
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

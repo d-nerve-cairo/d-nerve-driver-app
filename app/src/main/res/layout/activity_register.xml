@@ -13,7 +13,7 @@
         android:orientation="vertical"
         android:padding="24dp">
 
-        <!-- Back Arrow -->
+        <!-- Back Arrow with proper touch target -->
         <ImageView
             android:id="@+id/iv_back"
             android:layout_width="48dp"
@@ -21,21 +21,22 @@
             android:src="@drawable/ic_arrow_back"
             android:padding="12dp"
             app:tint="@color/text_primary"
-            android:contentDescription="Back"/>
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/nav_back"/>
 
         <!-- Title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Create Account"
+            android:text="@string/auth_create_account"
             android:textAppearance="@style/TextAppearance.DNerve.H2"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Join D-Nerve and start earning rewards"
+            android:text="@string/auth_join_tagline"
             android:textAppearance="@style/TextAppearance.DNerve.Body2"/>
 
         <!-- Form Card -->
@@ -53,73 +54,198 @@
                 android:orientation="vertical"
                 android:padding="24dp">
 
-                <!-- Name Input -->
+                <!-- Full Name -->
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Full Name"
+                    android:hint="@string/profile_name"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     app:startIconDrawable="@drawable/ic_person"
-                    android:layout_marginBottom="16dp">
+                    app:errorEnabled="true"
+                    android:layout_marginBottom="4dp">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/et_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textPersonName"
-                        android:maxLength="100"/>
+                        android:maxLines="1"
+                        android:imeOptions="actionNext"
+                        android:importantForAccessibility="yes"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Phone Input -->
+                <!-- Email -->
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Phone Number"
+                    android:hint="@string/auth_email"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    app:startIconDrawable="@drawable/ic_phone"
-                    android:layout_marginBottom="16dp">
+                    app:startIconDrawable="@drawable/ic_email"
+                    app:errorEnabled="true"
+                    android:layout_marginBottom="4dp">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/et_phone"
+                        android:id="@+id/et_email"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="phone"
-                        android:maxLength="15"/>
+                        android:inputType="textEmailAddress"
+                        android:maxLines="1"
+                        android:imeOptions="actionNext"
+                        android:importantForAccessibility="yes"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Vehicle Type Input -->
-                <com.google.android.material.textfield.TextInputLayout
+                <!-- Phone with Country Code -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Vehicle Type"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="4dp">
+
+                    <!-- Country Code Dropdown - Compact -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/til_country_code"
+                        android:layout_width="110dp"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/auth_code"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        android:layout_marginEnd="8dp">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/actv_country_code"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="none"
+                            android:textSize="16sp"
+                            android:importantForAccessibility="yes"
+                            android:contentDescription="@string/auth_country_code_desc"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Phone Number -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/til_phone"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="@string/profile_phone"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        app:errorEnabled="true">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_phone"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="phone"
+                            android:maxLength="15"
+                            android:imeOptions="actionNext"
+                            android:importantForAccessibility="yes"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <!-- Password with Material toggle -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/auth_password"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    app:startIconDrawable="@drawable/ic_lock"
+                    app:endIconMode="password_toggle"
+                    app:endIconContentDescription="@string/auth_toggle_password"
+                    app:errorEnabled="true"
+                    app:helperText="@string/auth_password_hint"
+                    android:layout_marginBottom="4dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_password"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:maxLines="1"
+                        android:imeOptions="actionNext"
+                        android:importantForAccessibility="yes"
+                        android:contentDescription="@string/auth_password"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Confirm Password with Material toggle -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_confirm_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/auth_confirm_password"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    app:startIconDrawable="@drawable/ic_lock"
+                    app:endIconMode="password_toggle"
+                    app:endIconContentDescription="@string/auth_toggle_password"
+                    app:errorEnabled="true"
+                    android:layout_marginBottom="4dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_confirm_password"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:maxLines="1"
+                        android:imeOptions="actionNext"
+                        android:importantForAccessibility="yes"
+                        android:contentDescription="@string/auth_confirm_password"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/divider"
+                    android:layout_marginVertical="16dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/profile_vehicle_info"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_secondary"
+                    android:layout_marginBottom="12dp"/>
+
+                <!-- Vehicle Type Dropdown -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_vehicle_type"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/profile_vehicle_type"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     app:startIconDrawable="@drawable/ic_directions_bus"
-                    android:layout_marginBottom="16dp">
+                    android:layout_marginBottom="4dp">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/et_vehicle_type"
+                    <AutoCompleteTextView
+                        android:id="@+id/actv_vehicle_type"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="text"
-                        android:text="Microbus"
-                        android:maxLength="50"/>
+                        android:inputType="none"
+                        android:importantForAccessibility="yes"
+                        android:contentDescription="@string/profile_vehicle_type"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- License Plate Input -->
+                <!-- License Plate -->
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_license_plate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="License Plate"
+                    android:hint="@string/profile_plate_number"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     app:startIconDrawable="@drawable/ic_badge"
-                    android:layout_marginBottom="24dp">
+                    app:errorEnabled="true"
+                    android:layout_marginBottom="16dp">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/et_license_plate"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textCapCharacters"
-                        android:maxLength="20"/>
+                        android:maxLength="20"
+                        android:imeOptions="actionDone"
+                        android:importantForAccessibility="yes"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Register Button -->
@@ -127,7 +253,7 @@
                     android:id="@+id/btn_register"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:text="Create Account"
+                    android:text="@string/auth_create_account"
                     android:textSize="16sp"
                     app:cornerRadius="28dp"/>
 
@@ -149,21 +275,30 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="24dp"
-            android:layout_gravity="center">
+            android:layout_marginBottom="24dp"
+            android:layout_gravity="center"
+            android:gravity="center_vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Already have an account? "
+                android:text="@string/auth_has_account"
                 android:textAppearance="@style/TextAppearance.DNerve.Body2"/>
 
             <TextView
                 android:id="@+id/tv_login"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Login"
+                android:layout_marginStart="4dp"
+                android:minWidth="48dp"
+                android:minHeight="48dp"
+                android:gravity="center"
+                android:text="@string/auth_sign_in"
                 android:textColor="@color/primary"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
         </LinearLayout>
 
     </LinearLayout>

@@ -2,11 +2,14 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_route"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    app:cardCornerRadius="12dp"
+    android:layout_marginBottom="10dp"
+    app:cardCornerRadius="14dp"
     app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/surface"
     app:rippleColor="@color/primary_light"
     android:clickable="true"
     android:focusable="true">
@@ -15,37 +18,69 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="14dp">
 
+        <!-- Top Row: Route Name + Duration -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
+            <!-- Route Icon -->
+            <ImageView
+                android:id="@+id/iv_route_icon"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:src="@drawable/ic_route"
+                app:tint="@color/primary"
+                android:contentDescription="Route" />
+
+            <!-- Route Name -->
             <TextView
                 android:id="@+id/tv_route_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_marginStart="10dp"
                 android:text="Ramses → Giza"
-                android:textSize="16sp"
+                android:textSize="15sp"
                 android:textStyle="bold"
-                android:textColor="@color/text_primary" />
+                android:textColor="@color/text_primary"
+                android:maxLines="1"
+                android:ellipsize="end" />
 
+            <!-- Duration Chip -->
             <TextView
                 android:id="@+id/tv_duration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="~45 min"
-                android:textSize="14sp"
-                android:textColor="@color/primary"
-                android:background="@drawable/bg_chip"
-                android:paddingHorizontal="12dp"
+                android:textSize="12sp"
+                android:textColor="@android:color/white"
+                android:background="@drawable/bg_chip_primary"
+                android:paddingHorizontal="10dp"
                 android:paddingVertical="4dp" />
 
         </LinearLayout>
 
+        <!-- Middle Row: Match Badge (for exact matches) -->
+        <TextView
+            android:id="@+id/tv_match_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="✓ Best Match"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:background="@drawable/bg_badge_success"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="3dp"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <!-- Bottom Row: Popularity + Distance to Pickup -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -53,26 +88,47 @@
             android:gravity="center_vertical"
             android:layout_marginTop="8dp">
 
-            <com.google.android.material.progressindicator.LinearProgressIndicator
-                android:id="@+id/progress_popularity"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="12dp"
-                app:trackThickness="6dp"
-                app:trackCornerRadius="3dp"
-                app:indicatorColor="@color/primary"
-                app:trackColor="@color/divider" />
-
+            <!-- Popularity -->
             <TextView
                 android:id="@+id/tv_popularity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="85% popular"
+                android:text="🔥 Popular"
                 android:textSize="12sp"
                 android:textColor="@color/text_secondary" />
 
+            <!-- Spacer -->
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <!-- Distance to Pickup -->
+            <TextView
+                android:id="@+id/tv_distance_from_driver"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="500 m to pickup"
+                android:textSize="12sp"
+                android:textColor="@color/success"
+                android:drawablePadding="4dp"
+                android:visibility="gone"
+                app:drawableStartCompat="@drawable/ic_walk_small"
+                tools:visibility="visible" />
+
         </LinearLayout>
+
+        <!-- Popularity Progress (subtle) -->
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progress_popularity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:trackThickness="3dp"
+            app:trackCornerRadius="2dp"
+            app:indicatorColor="@color/primary_light"
+            app:trackColor="@color/divider"
+            android:progress="75" />
 
     </LinearLayout>
 

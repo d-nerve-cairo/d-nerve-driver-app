@@ -2,6 +2,8 @@ package com.example.dnervecairo.activities;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -10,14 +12,18 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.dnervecairo.R;
 import com.example.dnervecairo.adapters.BadgeAdapter;
 import com.example.dnervecairo.api.ApiClient;
 import com.example.dnervecairo.api.responses.BadgeResponse;
+import com.example.dnervecairo.utils.NotificationHelper;
 import com.example.dnervecairo.utils.PreferenceManager;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.tabs.TabLayout;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,13 +35,15 @@ import retrofit2.Response;
 public class AchievementsActivity extends AppCompatActivity {
 
     private RecyclerView rvBadges;
+    private SwipeRefreshLayout swipeRefresh;
     private ProgressBar progressBar;
-    private TextView tvEmptyState;
+    private LinearLayout emptyState;
     private TextView tvEarnedCount;
     private TabLayout tabLayout;
 
     private BadgeAdapter adapter;
     private PreferenceManager prefManager;
+    private NotificationHelper notificationHelper;
     private String driverId;
 
     private List<BadgeResponse> allBadges = new ArrayList<>();
@@ -47,19 +55,24 @@ public class AchievementsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_achievements);
 
         prefManager = new PreferenceManager(this);
+        notificationHelper = new NotificationHelper(this);
         driverId = prefManager.getDriverId();
 
         initViews();
         setupToolbar();
         setupTabs();
         setupRecyclerView();
-        loadBadges();
+        setupSwipeRefresh();
+        
+        // First check for new badges, then load all badges
+        checkAndAwardBadges();
     }
 
     private void initViews() {
         rvBadges = findViewById(R.id.rv_badges);
+        swipeRefresh = findViewById(R.id.swipe_refresh);
         progressBar = findViewById(R.id.progress_bar);
-        tvEmptyState = findViewById(R.id.tv_empty_state);
+        emptyState = findViewById(R.id.empty_state);
         tvEarnedCount = findViewById(R.id.tv_earned_count);
         tabLayout = findViewById(R.id.tab_layout);
     }
@@ -97,30 +110,84 @@ public class AchievementsActivity extends AppCompatActivity {
         rvBadges.setAdapter(adapter);
     }
 
-    private void loadBadges() {
-        progressBar.setVisibility(View.VISIBLE);
-        tvEmptyState.setVisibility(View.GONE);
+    private void setupSwipeRefresh() {
+        swipeRefresh.setColorSchemeResources(R.color.primary, R.color.accent);
+        swipeRefresh.setOnRefreshListener(() -> {
+            checkAndAwardBadges();
+        });
+    }
 
+    /**
+     * Check and award any new badges, then load all badges
+     */
+    private void checkAndAwardBadges() {
+        showLoading(true);
+
+        ApiClient.getInstance().getApiService()
+                .checkBadges(driverId)
+                .enqueue(new Callback<JsonObject>() {
+                    @Override
+                    public void onResponse(@NonNull Call<JsonObject> call,
+                                           @NonNull Response<JsonObject> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            JsonObject result = response.body();
+                            
+                            // Check if any new badges were earned
+                            if (result.has("newly_earned")) {
+                                JsonArray newlyEarned = result.getAsJsonArray("newly_earned");
+                                if (newlyEarned.size() > 0) {
+                                    // Show notification for each new badge
+                                    for (int i = 0; i < newlyEarned.size(); i++) {
+                                        JsonObject badge = newlyEarned.get(i).getAsJsonObject();
+                                        String badgeName = badge.get("name").getAsString();
+                                        String badgeDesc = badge.has("description") ? 
+                                                badge.get("description").getAsString() : "";
+                                        
+                                        notificationHelper.showAchievementNotification(badgeName, badgeDesc);
+                                    }
+                                    
+                                    // Show toast
+                                    Toast.makeText(AchievementsActivity.this,
+                                            "🏆 " + newlyEarned.size() + " new badge(s) earned!",
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        }
+                        
+                        // Now load all badges
+                        loadBadges();
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<JsonObject> call, @NonNull Throwable t) {
+                        // Still try to load badges even if check fails
+                        loadBadges();
+                    }
+                });
+    }
+
+    private void loadBadges() {
         ApiClient.getInstance().getApiService()
                 .getBadgeProgress(driverId)
                 .enqueue(new Callback<List<BadgeResponse>>() {
                     @Override
                     public void onResponse(@NonNull Call<List<BadgeResponse>> call,
                                            @NonNull Response<List<BadgeResponse>> response) {
-                        progressBar.setVisibility(View.GONE);
+                        showLoading(false);
+                        
                         if (response.isSuccessful() && response.body() != null) {
                             allBadges = response.body();
                             updateEarnedCount();
                             filterBadges();
                         } else {
-                            showError("Failed to load badges");
+                            showError(getString(R.string.error_generic));
                         }
                     }
 
                     @Override
                     public void onFailure(@NonNull Call<List<BadgeResponse>> call, @NonNull Throwable t) {
-                        progressBar.setVisibility(View.GONE);
-                        showError("Network error: " + t.getMessage());
+                        showLoading(false);
+                        showError(getString(R.string.error_network));
                     }
                 });
     }
@@ -135,11 +202,9 @@ public class AchievementsActivity extends AppCompatActivity {
         }
 
         if (filtered.isEmpty()) {
-            tvEmptyState.setVisibility(View.VISIBLE);
-            rvBadges.setVisibility(View.GONE);
+            showEmptyState(true);
         } else {
-            tvEmptyState.setVisibility(View.GONE);
-            rvBadges.setVisibility(View.VISIBLE);
+            showEmptyState(false);
             adapter.setBadges(filtered);
         }
     }
@@ -149,12 +214,32 @@ public class AchievementsActivity extends AppCompatActivity {
         for (BadgeResponse badge : allBadges) {
             if (badge.isEarned()) earned++;
         }
-        tvEarnedCount.setText(earned + " / " + allBadges.size() + " Earned");
+        tvEarnedCount.setText(earned + " / " + allBadges.size() + " " + getString(R.string.achievements_earned));
+    }
+
+    private void showLoading(boolean show) {
+        if (show) {
+            progressBar.setVisibility(View.VISIBLE);
+            rvBadges.setVisibility(View.GONE);
+            emptyState.setVisibility(View.GONE);
+        } else {
+            progressBar.setVisibility(View.GONE);
+            swipeRefresh.setRefreshing(false);
+        }
+    }
+
+    private void showEmptyState(boolean show) {
+        if (show) {
+            emptyState.setVisibility(View.VISIBLE);
+            rvBadges.setVisibility(View.GONE);
+        } else {
+            emptyState.setVisibility(View.GONE);
+            rvBadges.setVisibility(View.VISIBLE);
+        }
     }
 
     private void showError(String message) {
-        tvEmptyState.setText(message);
-        tvEmptyState.setVisibility(View.VISIBLE);
-        rvBadges.setVisibility(View.GONE);
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        showEmptyState(true);
     }
 }

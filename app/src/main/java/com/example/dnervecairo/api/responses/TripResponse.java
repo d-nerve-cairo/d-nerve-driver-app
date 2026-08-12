@@ -6,7 +6,8 @@ public class TripResponse {
 
     @SerializedName("trip_id")
     private String tripId;
-
+    @SerializedName("route_name")
+    private String routeName;
     @SerializedName("driver_id")
     private String driverId;
 
@@ -85,7 +86,6 @@ public class TripResponse {
         return createdAt;
     }
 
-    // Distance not provided by backend, calculate estimate
     public double getDistanceKm() {
         // Rough estimate: ~0.5km per minute of travel
         return durationMinutes * 0.5;
@@ -93,5 +93,9 @@ public class TripResponse {
 
     public String getGpsPointsJson() {
         return gpsPointsJson;
+    }
+
+    public String getRouteName() {
+        return routeName;
     }
 }

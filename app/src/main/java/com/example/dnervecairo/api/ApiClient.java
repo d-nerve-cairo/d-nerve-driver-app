@@ -11,11 +11,10 @@ import java.util.concurrent.TimeUnit;
 public class ApiClient {
 
     // === TOGGLE THESE BASED ON DEVICE ===
-    // For real phone: use your PC's IP
-   private static final String BASE_URL = "http://172.25.18.14:8000/api/v1/";
-
+    // Real phone(PC's IP)
+    // private static final String BASE_URL = "http://172.25.19.54:8000/api/v1/";
     // For emulator only:
-    // private static final String BASE_URL = "http://10.0.2.2:8000/api/v1/";
+    private static final String BASE_URL = "http://10.0.2.2:8000/api/v1/";
 
     private static ApiClient instance;
     private final ApiService apiService;

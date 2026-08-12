@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
@@ -36,24 +37,27 @@
             android:exported="false"
             android:parentActivityName=".MainActivity"/>
 
-        <!-- Login Activity (NEW LAUNCHER) -->
+        <!-- Splash Activity (NEW LAUNCHER) -->
         <activity
-            android:name=".activities.LoginActivity"
-            android:exported="true">
+            android:name=".activities.SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.DNerveDriver.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
+        <!-- Login Activity -->
+        <activity
+            android:name=".activities.LoginActivity"
+            android:exported="false"/>
+
         <!-- Main Activity-->
         <activity
             android:name=".MainActivity"
             android:exported="false"
             android:launchMode="singleTop"/>
-
-        <!-- Splash Activity -->
-        <activity android:name=".activities.SplashActivity" android:exported="false"/>
 
         <!-- Register Activity -->
         <activity android:name=".activities.RegisterActivity" android:exported="false"/>
@@ -83,13 +87,6 @@
             android:exported="false"
             android:theme="@style/Theme.DNerveDriver" />
 
-        <!-- Rewards Activity -->
-
-        <activity
-            android:name=".activities.RewardsActivity"
-            android:parentActivityName=".MainActivity"
-            android:exported="false" />
-
         <!-- GPS Tracking Service -->
         <service
             android:name=".services.GpsTrackingService"
@@ -114,6 +111,11 @@
             android:exported="false"
             android:theme="@style/Theme.DNerveDriver" />
 
+        <activity
+            android:name=".activities.ForgotPasswordActivity"
+            android:exported="false"
+            android:theme="@style/Theme.DNerveDriver" />
+
         <!-- File Provider -->
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -125,6 +127,14 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
+        <!-- Firebase Messaging Service -->
+        <service
+            android:name=".services.DNerveFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
 
     </application>
 

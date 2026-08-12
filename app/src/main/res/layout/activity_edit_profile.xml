@@ -16,9 +16,10 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/primary"
             app:navigationIcon="@drawable/ic_arrow_back"
-            app:navigationIconTint="@color/white"
+            app:navigationIconTint="@android:color/white"
             app:title="Edit Profile"
-            app:titleTextColor="@color/white" />
+            app:titleTextColor="@android:color/white" />
+
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -32,14 +33,15 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Profile Picture Section -->
+            <!-- Profile Photo Section -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_photo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="@color/surface">
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@color/primary">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -48,40 +50,103 @@
                     android:padding="24dp"
                     android:gravity="center">
 
-                    <ImageView
-                        android:id="@+id/iv_avatar"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:src="@drawable/ic_person"
-                        android:padding="24dp"
-                        android:background="@drawable/circle_background_primary"
-                        app:tint="@color/white" />
+                    <!-- Avatar Container -->
+                    <FrameLayout
+                        android:layout_width="110dp"
+                        android:layout_height="110dp">
 
+                        <!-- Avatar Background -->
+                        <View
+                            android:layout_width="110dp"
+                            android:layout_height="110dp"
+                            android:background="@drawable/circle_white" />
+
+                        <!-- Avatar Image -->
+                        <ImageView
+                            android:id="@+id/iv_avatar"
+                            android:contentDescription="Profile photo. Tap to change"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_person"
+                            android:padding="24dp"
+                            android:background="@drawable/circle_white"
+                            app:tint="@color/primary"
+                            android:scaleType="centerInside"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                        <!-- Camera Badge -->
+                        <FrameLayout
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_gravity="bottom|end"
+                            android:background="@drawable/circle_accent"
+                            android:elevation="4dp">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_camera"
+                                app:tint="@android:color/white" />
+
+                        </FrameLayout>
+
+                    </FrameLayout>
+
+                    <!-- Change Photo Button -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_change_photo"
                         style="@style/Widget.MaterialComponents.Button.TextButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="12dp"
                         android:text="Change Photo"
-                        android:textColor="@color/primary" />
+                        android:textColor="@android:color/white"
+                        app:rippleColor="#33FFFFFF" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tap photo or button to change"
+                        android:textSize="12sp"
+                        android:textColor="#B3FFFFFF" />
+
                 </LinearLayout>
+
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Personal Information Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Personal Information"
-                android:textColor="@color/primary"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
-
-            <com.google.android.material.card.MaterialCardView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_person"
+                    app:tint="@color/primary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Personal Information"
+                    android:textColor="@color/primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_personal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="2dp"
                 app:cardBackgroundColor="@color/surface">
@@ -99,29 +164,38 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
-                        android:hint="Full Name"
+                        android:hint="Full Name *"
                         app:startIconDrawable="@drawable/ic_person"
-                        app:startIconTint="@color/text_secondary">
+                        app:startIconTint="@color/text_secondary"
+                        app:helperText="Your name as shown to other users"
+                        app:helperTextEnabled="true"
+                        app:counterEnabled="true"
+                        app:counterMaxLength="50"
+                        app:errorEnabled="true">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/et_name"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="textPersonName"
-                            android:maxLines="1" />
+                            android:maxLines="1"
+                            android:maxLength="50" />
+
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Phone Field -->
+                    <!-- Phone Field (Read-only) -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/til_phone"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
                         android:hint="Phone Number"
                         app:startIconDrawable="@drawable/ic_phone"
-                        app:startIconTint="@color/text_secondary"
+                        app:startIconTint="@color/text_hint"
                         app:helperText="Phone number cannot be changed"
-                        app:helperTextEnabled="true">
+                        app:helperTextEnabled="true"
+                        app:boxStrokeColor="@color/divider">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/et_phone"
@@ -129,25 +203,67 @@
                             android:layout_height="wrap_content"
                             android:inputType="phone"
                             android:maxLines="1"
-                            android:enabled="false" />
+                            android:enabled="false"
+                            android:textColor="@color/text_hint" />
+
                     </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Email Field -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/til_email"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Email Address"
+                        app:startIconDrawable="@drawable/ic_email"
+                        app:startIconTint="@color/text_secondary"
+                        app:helperText="Optional - for account recovery"
+                        app:helperTextEnabled="true"
+                        app:errorEnabled="true">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_email"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textEmailAddress"
+                            android:maxLines="1" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
                 </LinearLayout>
+
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Vehicle Information Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Vehicle Information"
-                android:textColor="@color/primary"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
-
-            <com.google.android.material.card.MaterialCardView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_directions_bus"
+                    app:tint="@color/primary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Vehicle Information"
+                    android:textColor="@color/primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_vehicle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="2dp"
                 app:cardBackgroundColor="@color/surface">
@@ -165,9 +281,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
-                        android:hint="Vehicle Type"
+                        android:hint="Vehicle Type *"
                         app:startIconDrawable="@drawable/ic_directions_bus"
-                        app:startIconTint="@color/text_secondary">
+                        app:startIconTint="@color/text_secondary"
+                        app:helperText="Select your vehicle type"
+                        app:helperTextEnabled="true">
 
                         <AutoCompleteTextView
                             android:id="@+id/dropdown_vehicle_type"
@@ -175,6 +293,7 @@
                             android:layout_height="wrap_content"
                             android:inputType="none"
                             android:cursorVisible="false" />
+
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <!-- License Plate Field -->
@@ -183,9 +302,12 @@
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="License Plate"
+                        android:hint="License Plate *"
                         app:startIconDrawable="@drawable/ic_badge"
-                        app:startIconTint="@color/text_secondary">
+                        app:startIconTint="@color/text_secondary"
+                        app:helperText="Your vehicle's license plate number"
+                        app:helperTextEnabled="true"
+                        app:errorEnabled="true">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/et_license_plate"
@@ -193,9 +315,115 @@
                             android:layout_height="wrap_content"
                             android:inputType="textCapCharacters"
                             android:maxLines="1" />
+
                     </com.google.android.material.textfield.TextInputLayout>
+
                 </LinearLayout>
+
             </com.google.android.material.card.MaterialCardView>
+
+            <!-- Emergency & Additional Info Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_info"
+                    app:tint="@color/primary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Additional Information"
+                    android:textColor="@color/primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_emergency"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/surface">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Emergency Contact Field -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/til_emergency_contact"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:hint="Emergency Contact"
+                        app:startIconDrawable="@drawable/ic_emergency"
+                        app:startIconTint="@color/error"
+                        app:helperText="Phone number to contact in emergencies"
+                        app:helperTextEnabled="true"
+                        app:errorEnabled="true">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_emergency_contact"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="phone"
+                            android:maxLines="1" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Bio Field -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/til_bio"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="About Me"
+                        app:startIconDrawable="@drawable/ic_notes"
+                        app:startIconTint="@color/text_secondary"
+                        app:helperText="A short description about yourself (optional)"
+                        app:helperTextEnabled="true"
+                        app:counterEnabled="true"
+                        app:counterMaxLength="200"
+                        app:errorEnabled="true">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_bio"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textMultiLine|textCapSentences"
+                            android:minLines="3"
+                            android:maxLines="5"
+                            android:maxLength="200"
+                            android:gravity="top" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Required Fields Note -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="* Required fields"
+                android:textSize="12sp"
+                android:textColor="@color/text_hint" />
 
             <!-- Save Button -->
             <com.google.android.material.button.MaterialButton
@@ -205,17 +433,36 @@
                 android:text="Save Changes"
                 android:textSize="16sp"
                 app:cornerRadius="12dp"
+                app:icon="@drawable/ic_check_circle"
+                app:iconGravity="textStart"
+                app:iconTint="@android:color/white"
                 android:backgroundTint="@color/primary" />
 
-            <!-- Loading Indicator -->
-            <ProgressBar
-                android:id="@+id/progress_bar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="16dp"
-                android:visibility="gone" />
+            <!-- Bottom spacer -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="24dp" />
 
         </LinearLayout>
+
     </androidx.core.widget.NestedScrollView>
+
+    <!-- Loading Overlay -->
+    <FrameLayout
+        android:id="@+id/progress_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminateTint="@android:color/white" />
+
+    </FrameLayout>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

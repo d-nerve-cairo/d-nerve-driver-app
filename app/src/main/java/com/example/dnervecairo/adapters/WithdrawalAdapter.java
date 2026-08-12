@@ -67,22 +67,37 @@ public class WithdrawalAdapter extends RecyclerView.Adapter<WithdrawalAdapter.Vi
             String status = withdrawal.getStatus();
             tvStatus.setText(capitalize(status));
 
-            // Status colors
+            // Status colors for text and icon (Improvement #3)
             int statusColor;
+            int statusIcon;
             switch (status.toLowerCase()) {
                 case "completed":
+                case "approved":
                     statusColor = ContextCompat.getColor(itemView.getContext(), R.color.success);
+                    statusIcon = R.drawable.ic_check_circle;
                     break;
                 case "pending":
+                case "processing":
                     statusColor = ContextCompat.getColor(itemView.getContext(), R.color.warning);
+                    statusIcon = R.drawable.ic_pending;
                     break;
                 case "rejected":
+                case "failed":
                     statusColor = ContextCompat.getColor(itemView.getContext(), R.color.error);
+                    statusIcon = R.drawable.ic_error;
                     break;
                 default:
                     statusColor = ContextCompat.getColor(itemView.getContext(), R.color.text_secondary);
+                    statusIcon = R.drawable.ic_withdraw;
             }
+            
             tvStatus.setTextColor(statusColor);
+            
+            // Update icon with status color
+            if (ivStatus != null) {
+                ivStatus.setImageResource(statusIcon);
+                ivStatus.setColorFilter(statusColor);
+            }
         }
 
         private String formatDate(String dateStr) {

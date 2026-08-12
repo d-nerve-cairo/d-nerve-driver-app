@@ -1,40 +1,140 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- D-Nerve Driver App - strings.xml -->
 <!-- Location: app/src/main/res/values/strings.xml -->
+
 <resources>
-    <!-- App Info -->
+    <!-- ============================================================== -->
+    <!-- APP INFO                                                        -->
+    <!-- ============================================================== -->
     <string name="app_name">D-Nerve Driver</string>
     <string name="app_tagline">Drive. Earn. Connect Cairo.</string>
-    
-    <!-- Navigation -->
+
+    <!-- ============================================================== -->
+    <!-- NAVIGATION                                                      -->
+    <!-- ============================================================== -->
     <string name="nav_home">Home</string>
     <string name="nav_leaderboard">Leaderboard</string>
     <string name="nav_rewards">Rewards</string>
     <string name="nav_profile">Profile</string>
-    
-    <!-- Home Screen -->
+    <string name="nav_back">Go back</string>
+
+    <!-- ============================================================== -->
+    <!-- HOME SCREEN                                                     -->
+    <!-- ============================================================== -->
     <string name="home_welcome">Welcome back!</string>
     <string name="home_points_label">points</string>
     <string name="home_today_stats">Today\'s Stats</string>
     <string name="home_quick_actions">Quick Actions</string>
     <string name="home_view_history">View History</string>
     <string name="home_withdraw">Withdraw</string>
-    
-    <!-- Trip Recording -->
+    <string name="home_history_desc">View all your past trips</string>
+    <string name="home_rewards_desc">View balance &amp; withdraw</string>
+    <string name="home_your_stats">Your Stats</string>
+    <string name="home_trip_history">Trip History</string>
+    <string name="home_trip_history_desc">View all your past trips</string>
+    <string name="home_rewards">Rewards</string>
+    <string name="home_complete_trips_hint">Complete trips to earn points!</string>
+    <string name="home_max_tier_reached">Maximum tier reached! 🎉</string>
+
+    <!-- ============================================================== -->
+    <!-- TIME-BASED GREETINGS                                            -->
+    <!-- ============================================================== -->
+    <string name="greeting_morning">Good morning</string>
+    <string name="greeting_afternoon">Good afternoon</string>
+    <string name="greeting_evening">Good evening</string>
+    <string name="greeting_night">Good night</string>
+
+    <!-- ============================================================== -->
+    <!-- TRIP RECORDING (StartTripActivity)                              -->
+    <!-- ============================================================== -->
     <string name="trip_start">Start Trip</string>
-    <string name="trip_stop">Stop Trip</string>
+    <string name="select_route">Select Route</string>
+    <string name="enter_route">Enter Route</string>
+    <string name="popular_routes">Popular Routes</string>
+    <string name="nearby_routes">Nearby Routes</string>
+    <string name="routes_nearby">Nearby Routes</string>
+    <string name="all_routes">All Routes</string>
+    <string name="filter_nearby">📍 Nearby</string>
+    <string name="filter_popular">🔥 Popular</string>
+    <string name="filter_all">All Routes</string>
+    <string name="no_nearby_routes">No routes found nearby. Try "All Routes".</string>
+    <string name="no_routes_found">No routes found</string>
+    <string name="current_location">Current Location</string>
+    <string name="start_location">Start Location</string>
+    <string name="destination">Destination</string>
+    <string name="tap_to_use">Tap to use as starting point</string>
+    <string name="use">USE</string>
+    <string name="decrease">Decrease</string>
+    <string name="increase">Increase</string>
+    <string name="estimated_time">Estimated Time</string>
+    <string name="ai_predicted_eta">AI Predicted ETA</string>
+    <string name="error_select_route">Please select start and destination</string>
+
+    <!-- ============================================================== -->
+    <!-- TRIP ACTIVE (TripActivity)                                      -->
+    <!-- ============================================================== -->
     <string name="trip_active">Active Trip</string>
     <string name="trip_paused">Trip Paused</string>
-    <string name="trip_duration">Duration</string>
+    <string name="trip_stop">Stop Trip</string>
+    <string name="trip_duration">Trip Duration</string>
+    <string name="trip_duration_label">Trip Duration</string>
     <string name="trip_distance">Distance</string>
     <string name="trip_gps_points">GPS Points</string>
     <string name="trip_quality">Quality</string>
+    <string name="trip_traveled">Traveled</string>
+    <string name="trip_remaining">Remaining</string>
+    <string name="trip_speed">Speed</string>
+    <string name="trip_est_points">Est. Points</string>
+    <string name="trip_passengers">Passengers</string>
+    <string name="trip_eta_format">ETA: %1$sm</string>
+
+    <!-- Trip Stats Labels (short) -->
+    <string name="traveled">Traveled</string>
+    <string name="remaining">Remaining</string>
+    <string name="speed">Speed</string>
+    <string name="gps_points">GPS Points</string>
+    <string name="est_points">Est. Points</string>
+    <string name="passengers">Passengers</string>
+    <string name="arriving">Arriving</string>
+    <string name="starting_trip">Starting trip…</string>
+    <string name="passing">Passing: %s</string>
+
+
+    <!-- Trip History Screen -->
+    <string name="history_trips">Trips</string>
+    <string name="history_earned">Earned</string>
+    <string name="history_traveled">Traveled</string>
+    <string name="filter_this_week">This Week</string>
+    <string name="filter_this_month">This Month</string>
+    <string name="view_on_map">View on Map</string>
+    <string name="quality">Quality</string>
+    <string name="points">Points</string>
+
+    <!-- GPS Status -->
     <string name="trip_gps_status">GPS Status</string>
     <string name="trip_gps_active">Active</string>
+    <string name="trip_gps_active_label">GPS Active</string>
     <string name="trip_gps_weak">Weak Signal</string>
     <string name="trip_gps_off">GPS Off</string>
-    
-    <!-- Trip Summary -->
+    <string name="gps_active">GPS Active</string>
+    <string name="gps_waiting">Waiting…</string>
+    <string name="gps_off">GPS Off</string>
+    <string name="gps_excellent">Excellent</string>
+    <string name="gps_good">Good</string>
+    <string name="gps_fair">Fair</string>
+    <string name="gps_weak">Weak</string>
+
+    <!-- Offline Mode -->
+    <string name="offline_mode">Offline Mode</string>
+    <string name="offline_mode_banner">📴 Offline Mode - Trip will sync when online</string>
+    <string name="offline_trip_saved">Trip saved - will sync when online</string>
+    <string name="offline_syncing">Syncing…</string>
+    <string name="offline_sync_complete">Sync complete</string>
+    <string name="offline_saved_banner">📴 Trip saved offline - will sync when online</string>
+
+    <!-- ============================================================== -->
+    <!-- TRIP SUMMARY                                                    -->
+    <!-- ============================================================== -->
     <string name="trip_complete">Trip Complete!</string>
     <string name="trip_summary">Trip Summary</string>
     <string name="trip_points_earned">Points Earned</string>
@@ -46,23 +146,50 @@
     <string name="trip_streak_bonus">Streak Bonus</string>
     <string name="trip_total">Total</string>
     <string name="trip_back_home">Back to Home</string>
-    
-    <!-- Stats -->
+    <string name="trip_route_label">Route</string>
+
+    <!-- ============================================================== -->
+    <!-- PASSENGER COUNT                                                 -->
+    <!-- ============================================================== -->
+    <string name="passenger_count">Passenger Count</string>
+
+    <!-- ============================================================== -->
+    <!-- MAP                                                             -->
+    <!-- ============================================================== -->
+    <string name="map_start_marker">Start</string>
+    <string name="map_end_marker">End</string>
+    <string name="map_current_location">Your Location</string>
+    <string name="map_preview">Map Preview</string>
+
+    <!-- ============================================================== -->
+    <!-- STATS                                                           -->
+    <!-- ============================================================== -->
     <string name="stats_trips">Trips</string>
     <string name="stats_quality">Quality</string>
     <string name="stats_streak">Streak</string>
     <string name="stats_day_streak">day streak</string>
     <string name="stats_days_streak">days streak</string>
-    
-    <!-- Tiers -->
+    <string name="stats_avg_quality">Avg Quality</string>
+    <string name="stats_total_trips">Total Trips</string>
+    <string name="stats_total_points">Total Points</string>
+
+    <!-- ============================================================== -->
+    <!-- TIERS                                                           -->
+    <!-- ============================================================== -->
     <string name="tier_bronze">Bronze</string>
     <string name="tier_silver">Silver</string>
     <string name="tier_gold">Gold</string>
     <string name="tier_platinum">Platinum</string>
     <string name="tier_progress">%1$d / %2$d points to %3$s</string>
     <string name="tier_driver">%1$s Driver</string>
-    
-    <!-- Leaderboard -->
+    <string name="tier_bronze_driver">Bronze Driver</string>
+    <string name="tier_silver_driver">Silver Driver</string>
+    <string name="tier_gold_driver">Gold Driver</string>
+    <string name="tier_platinum_driver">Platinum Driver</string>
+
+    <!-- ============================================================== -->
+    <!-- LEADERBOARD                                                     -->
+    <!-- ============================================================== -->
     <string name="leaderboard_title">Leaderboard</string>
     <string name="leaderboard_your_rank">Your Rank</string>
     <string name="leaderboard_top_drivers">Top Drivers</string>
@@ -71,17 +198,49 @@
     <string name="leaderboard_by_points">By Points</string>
     <string name="leaderboard_by_quality">By Quality</string>
     <string name="leaderboard_by_trips">By Trips</string>
-    
-    <!-- Rewards -->
+    <string name="leaderboard_you">You</string>
+    <string name="leaderboard_others">Other Drivers</string>
+    <string name="leaderboard_login_required">Login to view leaderboard</string>
+    <string name="leaderboard_offline">Leaderboard requires internet connection</string>
+    <string name="leaderboard_load_failed">Failed to load leaderboard</string>
+    <string name="leaderboard_network_error">Network error - check your connection</string>
+    <string name="leaderboard_no_data">No data available</string>
+    <string name="sort_points">Points</string>
+    <string name="sort_trips">Trips</string>
+    <string name="sort_streak">Streak</string>
+    <string name="sort_quality">Quality</string>
+
+    <!-- ============================================================== -->
+    <!-- REWARDS                                                         -->
+    <!-- ============================================================== -->
     <string name="rewards_title">Rewards</string>
     <string name="rewards_balance">Available Balance</string>
     <string name="rewards_withdraw">Withdraw</string>
-    <string name="rewards_history">Transaction History</string>
-    <string name="rewards_pending">Pending</string>
-    <string name="rewards_completed">Completed</string>
-    <string name="rewards_min_withdrawal">Minimum withdrawal: %1$d points</string>
-    
-    <!-- Profile -->
+    <string name="rewards_total_earned">Total Earned</string>
+    <string name="rewards_withdrawn">Withdrawn</string>
+    <string name="rewards_how_it_works">How It Works</string>
+    <string name="rewards_step_1">Drive and collect GPS data</string>
+    <string name="rewards_step_2">Earn points for quality trips</string>
+    <string name="rewards_step_3">10 points = 1 EGP</string>
+    <string name="rewards_step_4">Withdraw when balance ≥ 5 EGP</string>
+    <string name="rewards_history">Withdrawal History</string>
+    <string name="rewards_no_withdrawals">No withdrawals yet</string>
+    <string name="rewards_no_withdrawals_hint">Your withdrawal history will appear here</string>
+    <string name="rewards_weekly_earnings">Weekly Earnings</string>
+    <string name="rewards_no_earnings_data">No earnings data yet</string>
+
+    <!-- ============================================================== -->
+    <!-- WITHDRAWAL                                                      -->
+    <!-- ============================================================== -->
+    <string name="dialog_withdraw_funds">Withdraw Funds</string>
+    <string name="withdrawal_confirm_title">Confirm Withdrawal</string>
+    <string name="withdrawal_confirm_message">You are about to withdraw:\n\n💰 Amount: %1$s EGP\n📱 Method: %2$s\n🔢 Account: %3$s\n\nThis will deduct %4$d points from your balance.\n\nProceed?</string>
+    <string name="withdrawal_success">Withdrawal request submitted!</string>
+    <string name="withdrawal_failed">Withdrawal failed. Try again.</string>
+
+    <!-- ============================================================== -->
+    <!-- PROFILE                                                         -->
+    <!-- ============================================================== -->
     <string name="profile_title">Profile</string>
     <string name="profile_edit">Edit Profile</string>
     <string name="profile_personal_info">Personal Information</string>
@@ -95,10 +254,21 @@
     <string name="profile_vehicle_type">Vehicle Type</string>
     <string name="profile_plate_number">Plate Number</string>
     <string name="profile_member_since">Member since %1$s</string>
-    
-    <!-- Auth -->
+    <string name="profile_documents">Driver Documents</string>
+    <string name="profile_change_photo">Change Photo</string>
+    <string name="profile_section_account">Account</string>
+    <string name="profile_section_achievements">Achievements &amp; Documents</string>
+    <string name="profile_section_personal">Personal Information</string>
+    <string name="profile_section_vehicle">Vehicle Information</string>
+    <string name="profile_section_app">App</string>
+    <string name="profile_tier_progress">Tier Progress</string>
+
+    <!-- ============================================================== -->
+    <!-- AUTHENTICATION                                                  -->
+    <!-- ============================================================== -->
     <string name="auth_login">Login</string>
     <string name="auth_register">Register</string>
+    <string name="auth_email">Email</string>
     <string name="auth_phone_number">Phone Number</string>
     <string name="auth_password">Password</string>
     <string name="auth_confirm_password">Confirm Password</string>
@@ -107,8 +277,29 @@
     <string name="auth_has_account">Already have an account?</string>
     <string name="auth_sign_up">Sign Up</string>
     <string name="auth_sign_in">Sign In</string>
-    
-    <!-- Settings -->
+    <string name="auth_welcome_back">Welcome Back</string>
+    <string name="auth_create_account">Create Account</string>
+    <string name="auth_join_tagline">Join D-Nerve and start earning rewards</string>
+    <string name="auth_remember_me">Remember me</string>
+    <string name="auth_country">Country</string>
+    <string name="auth_code">Code</string>
+    <string name="auth_toggle_password">Toggle password visibility</string>
+    <string name="auth_country_code_desc">Select country code</string>
+    <string name="auth_password_hint">Minimum 6 characters with at least 1 number</string>
+    <string name="auth_welcome_message">Welcome back, %1$s!</string>
+    <string name="auth_register_success">Welcome to D-Nerve, %1$s!</string>
+
+    <!-- Password Reset -->
+    <string name="auth_forgot_password_title">Forgot Password</string>
+    <string name="auth_forgot_password_subtitle">Enter your email to receive a reset code</string>
+    <string name="auth_send_reset_code">Send Reset Code</string>
+    <string name="auth_reset_code">Reset Code</string>
+    <string name="auth_new_password">New Password</string>
+    <string name="auth_reset_password">Reset Password</string>
+
+    <!-- ============================================================== -->
+    <!-- SETTINGS                                                        -->
+    <!-- ============================================================== -->
     <string name="settings_title">Settings</string>
     <string name="settings_notifications">Notifications</string>
     <string name="settings_location">Location Settings</string>
@@ -118,16 +309,99 @@
     <string name="settings_terms">Terms of Service</string>
     <string name="settings_support">Support</string>
     <string name="settings_version">Version %1$s</string>
-    
-    <!-- Permissions -->
+    <string name="settings_dark_mode">Dark Mode</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_gps">GPS Settings</string>
+    <string name="settings_gps_accuracy">GPS Accuracy</string>
+    <string name="settings_gps_accuracy_hint">Higher accuracy uses more battery</string>
+    <string name="settings_gps_battery_saver">Battery Saver</string>
+    <string name="settings_gps_balanced">Balanced</string>
+    <string name="settings_gps_high_accuracy">High Accuracy</string>
+    <string name="settings_gps_updated">GPS accuracy updated</string>
+    <string name="settings_update_interval">Update Interval</string>
+    <string name="settings_update_interval_hint">How often GPS location is recorded</string>
+    <string name="settings_interval_5s">5 seconds</string>
+    <string name="settings_interval_10s">10 seconds</string>
+    <string name="settings_interval_15s">15 seconds</string>
+    <string name="settings_interval_30s">30 seconds</string>
+    <string name="settings_interval_updated">Update interval updated</string>
+
+    <string name="settings_push_notifications">Push Notifications</string>
+    <string name="settings_push_notifications_hint">Receive app notifications</string>
+    <string name="settings_trip_reminders">Trip Reminders</string>
+    <string name="settings_trip_reminders_hint">Remind to start tracking trips</string>
+    <string name="settings_reward_alerts">Reward Alerts</string>
+    <string name="settings_reward_alerts_hint">Notify when rewards are available</string>
+
+    <string name="settings_data_storage">Data &amp; Storage</string>
+    <string name="settings_auto_sync">Auto Sync</string>
+    <string name="settings_auto_sync_hint">Automatically sync trip data</string>
+    <string name="settings_wifi_only">WiFi Only</string>
+    <string name="settings_wifi_only_hint">Only sync when connected to WiFi</string>
+    <string name="settings_dark_mode_hint">Switch to dark theme</string>
+    <string name="settings_language_hint">Choose app language</string>
+    <string name="settings_app_version">App Version</string>
+    <string name="error_open_link">Could not open link</string>
+    <string name="logging_out">Logging out…</string>
+    <string name="logout_confirm_message">Are you sure you want to logout?</string>
+
+    <!-- ============================================================== -->
+    <!-- DOCUMENTS                                                       -->
+    <!-- ============================================================== -->
+    <string name="documents_title">Documents</string>
+    <string name="documents_upload">Upload Document</string>
+    <string name="documents_driving_license">Driving License</string>
+    <string name="documents_vehicle_license">Vehicle License</string>
+    <string name="documents_national_id">National ID</string>
+    <string name="documents_vehicle_photo">Vehicle Photo</string>
+    <string name="documents_profile_photo">Profile Photo</string>
+    <string name="documents_pending">Pending Review</string>
+    <string name="documents_verified">Verified</string>
+    <string name="documents_rejected">Rejected</string>
+
+    <!-- ============================================================== -->
+    <!-- ACHIEVEMENTS                                                    -->
+    <!-- ============================================================== -->
+    <string name="achievements_title">Achievements</string>
+    <string name="achievements_earned">Earned</string>
+    <string name="achievements_all">All</string>
+    <string name="achievements_trips">Trips</string>
+    <string name="achievements_quality">Quality</string>
+    <string name="achievements_streak">Streak</string>
+    <string name="achievements_points">Points</string>
+    <string name="achievements_empty_title">No badges yet</string>
+    <string name="achievements_empty_message">Complete trips and challenges to earn badges!</string>
+
+    <!-- ============================================================== -->
+    <!-- PERMISSIONS                                                     -->
+    <!-- ============================================================== -->
     <string name="permission_location_title">Location Permission Required</string>
     <string name="permission_location_message">D-Nerve needs location access to track your trips and calculate earnings.</string>
     <string name="permission_location_background_title">Background Location</string>
     <string name="permission_location_background_message">Allow location access all the time to track trips even when the app is in the background.</string>
     <string name="permission_grant">Grant Permission</string>
     <string name="permission_deny">Deny</string>
-    
-    <!-- Errors -->
+
+    <!-- ============================================================== -->
+    <!-- NOTIFICATIONS                                                   -->
+    <!-- ============================================================== -->
+    <string name="notification_channel_trip">Trip Tracking</string>
+    <string name="notification_channel_trip_desc">Shows when a trip is being recorded</string>
+    <string name="notification_trip_active">Recording trip…</string>
+    <string name="notification_trip_tap_stop">Tap to stop</string>
+
+    <!-- ============================================================== -->
+    <!-- LOGOUT                                                          -->
+    <!-- ============================================================== -->
+    <string name="logout_title">Logout</string>
+    <string name="logout_message">Are you sure you want to logout?</string>
+    <string name="logout_confirm">Logout</string>
+    <string name="logout_success">Logged out successfully</string>
+    <string name="logout">Logout</string>
+
+    <!-- ============================================================== -->
+    <!-- ERRORS                                                          -->
+    <!-- ============================================================== -->
     <string name="error_generic">Something went wrong. Please try again.</string>
     <string name="error_network">No internet connection. Please check your network.</string>
     <string name="error_location">Unable to get your location. Please enable GPS.</string>
@@ -136,45 +410,79 @@
     <string name="error_invalid_phone">Please enter a valid phone number</string>
     <string name="error_password_mismatch">Passwords do not match</string>
     <string name="error_password_weak">Password must be at least 6 characters</string>
-    
-    <!-- Success Messages -->
+    <string name="error_invalid_amount">Invalid amount</string>
+    <string name="error_insufficient_balance">Exceeds available balance</string>
+    <string name="error_select_payment_method">Select payment method</string>
+    <string name="error_enter_amount">Enter amount</string>
+    <string name="error_enter_account">Enter account number</string>
+
+    <!-- Auth Errors -->
+    <string name="error_email_required">Email is required</string>
+    <string name="error_email_invalid">Enter a valid email</string>
+    <string name="error_password_required">Password is required</string>
+    <string name="error_password_short">Minimum 6 characters</string>
+    <string name="error_password_no_number">Must contain at least one number</string>
+    <string name="error_confirm_password">Please confirm password</string>
+    <string name="error_name_required">Name is required</string>
+    <string name="error_name_short">Name is too short</string>
+    <string name="error_phone_required">Phone is required</string>
+    <string name="error_phone_short">Phone number is too short</string>
+    <string name="error_license_required">License plate is required</string>
+    <string name="error_login_failed">Login failed</string>
+    <string name="error_invalid_credentials">Invalid email or password</string>
+    <string name="error_account_not_found">Account not found</string>
+    <string name="error_registration_failed">Registration failed</string>
+    <string name="error_email_exists">Email already registered</string>
+    <string name="error_phone_exists">Phone already registered</string>
+
+    <!-- ============================================================== -->
+    <!-- SUCCESS MESSAGES                                                -->
+    <!-- ============================================================== -->
     <string name="success_trip_submitted">Trip submitted successfully!</string>
     <string name="success_profile_updated">Profile updated successfully!</string>
     <string name="success_withdrawal_requested">Withdrawal request submitted!</string>
-    
-    <!-- Buttons -->
+
+    <!-- ============================================================== -->
+    <!-- BUTTONS                                                         -->
+    <!-- ============================================================== -->
     <string name="btn_ok">OK</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_retry">Retry</string>
     <string name="btn_save">Save</string>
     <string name="btn_confirm">Confirm</string>
     <string name="btn_continue">Continue</string>
-    
-    <!-- Time Formats -->
+    <string name="retry">Retry</string>
+    <string name="loading">Loading...</string>
+
+    <!-- ============================================================== -->
+    <!-- TIME FORMATS                                                    -->
+    <!-- ============================================================== -->
     <string name="time_format_hms">%1$02d:%2$02d:%3$02d</string>
     <string name="time_format_ms">%1$02d:%2$02d</string>
     <string name="time_minutes">%1$d min</string>
     <string name="time_hours">%1$d hr</string>
-    
-    <!-- Distance -->
+
+    <!-- ============================================================== -->
+    <!-- DISTANCE                                                        -->
+    <!-- ============================================================== -->
     <string name="distance_km">%1$.1f km</string>
     <string name="distance_m">%1$d m</string>
-    
-    <!-- Quality Labels -->
+
+    <!-- ============================================================== -->
+    <!-- QUALITY LABELS                                                  -->
+    <!-- ============================================================== -->
     <string name="quality_excellent">Excellent</string>
     <string name="quality_good">Good</string>
     <string name="quality_fair">Fair</string>
     <string name="quality_poor">Poor</string>
-    
-    <!-- Empty States -->
+
+    <!-- ============================================================== -->
+    <!-- EMPTY STATES                                                    -->
+    <!-- ============================================================== -->
     <string name="empty_trips">No trips yet</string>
     <string name="empty_trips_hint">Start your first trip to see it here!</string>
     <string name="empty_rewards">No transactions yet</string>
     <string name="empty_leaderboard">No data available</string>
-    
-    <!-- Notifications -->
-    <string name="notification_channel_trip">Trip Tracking</string>
-    <string name="notification_channel_trip_desc">Shows when a trip is being recorded</string>
-    <string name="notification_trip_active">Recording trip…</string>
-    <string name="notification_trip_tap_stop">Tap to stop</string>
+    <string name="empty_history_hint">Start a trip to see your history here</string>
+
 </resources>

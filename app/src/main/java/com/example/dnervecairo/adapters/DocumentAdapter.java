@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.dnervecairo.R;
@@ -32,7 +33,7 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.Docume
     }
 
     public void setDocuments(List<DocumentResponse> documents) {
-        this.documents = documents;
+        this.documents = documents != null ? documents : new ArrayList<>();
         notifyDataSetChanged();
     }
 
@@ -59,6 +60,7 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.Docume
         private final ImageView ivIcon, ivStatus;
         private final TextView tvTitle, tvStatus, tvRejectionReason;
         private final MaterialButton btnAction;
+        private final View layoutRequired;
 
         DocumentViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -69,6 +71,7 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.Docume
             tvStatus = itemView.findViewById(R.id.tv_status);
             tvRejectionReason = itemView.findViewById(R.id.tv_rejection_reason);
             btnAction = itemView.findViewById(R.id.btn_action);
+            layoutRequired = itemView.findViewById(R.id.badge_required);
         }
 
         void bind(DocumentResponse doc) {
@@ -76,70 +79,116 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.Docume
             tvTitle.setText(getDocumentTitle(doc.getDocumentType()));
             ivIcon.setImageResource(getDocumentIcon(doc.getDocumentType()));
 
-            // Set status
+            // Required badge
+            boolean isRequired = isRequiredDocument(doc.getDocumentType());
+            if (layoutRequired != null) {
+                layoutRequired.setVisibility(isRequired ? View.VISIBLE : View.GONE);
+            }
+
+            // Set status with proper colors
             String status = doc.getStatus();
+            if (status == null) status = "not_uploaded";
+            
             switch (status) {
                 case "not_uploaded":
-                    tvStatus.setText("Not Uploaded");
-                    tvStatus.setTextColor(itemView.getContext().getResources().getColor(R.color.text_secondary, null));
-                    ivStatus.setImageResource(R.drawable.ic_upload);
-                    ivStatus.setColorFilter(itemView.getContext().getResources().getColor(R.color.text_secondary, null));
-                    btnAction.setText("Upload");
-                    btnAction.setOnClickListener(v -> listener.onUploadClick(doc));
+                    setStatusUI("Not Uploaded", R.color.text_secondary, R.drawable.ic_upload);
+                    setActionButton("Upload", true, doc);
                     tvRejectionReason.setVisibility(View.GONE);
                     break;
 
                 case "pending":
-                    tvStatus.setText("Pending Review");
-                    tvStatus.setTextColor(itemView.getContext().getResources().getColor(R.color.warning, null));
-                    ivStatus.setImageResource(R.drawable.ic_pending);
-                    ivStatus.setColorFilter(itemView.getContext().getResources().getColor(R.color.warning, null));
-                    btnAction.setText("Replace");
-                    btnAction.setOnClickListener(v -> listener.onUploadClick(doc));
+                    setStatusUI("Pending Review", R.color.warning, R.drawable.ic_pending);
+                    setActionButton("Replace", true, doc);
                     tvRejectionReason.setVisibility(View.GONE);
                     break;
 
                 case "approved":
-                    tvStatus.setText("Approved");
-                    tvStatus.setTextColor(itemView.getContext().getResources().getColor(R.color.success, null));
-                    ivStatus.setImageResource(R.drawable.ic_check_circle);
-                    ivStatus.setColorFilter(itemView.getContext().getResources().getColor(R.color.success, null));
-                    btnAction.setText("View");
-                    btnAction.setOnClickListener(v -> listener.onViewClick(doc));
+                    setStatusUI("Approved", R.color.success, R.drawable.ic_check_circle);
+                    setActionButton("View", false, doc);
                     tvRejectionReason.setVisibility(View.GONE);
                     break;
 
                 case "rejected":
-                    tvStatus.setText("Rejected");
-                    tvStatus.setTextColor(itemView.getContext().getResources().getColor(R.color.error, null));
-                    ivStatus.setImageResource(R.drawable.ic_error);
-                    ivStatus.setColorFilter(itemView.getContext().getResources().getColor(R.color.error, null));
-                    btnAction.setText("Re-upload");
-                    btnAction.setOnClickListener(v -> listener.onUploadClick(doc));
-                    if (doc.getRejectionReason() != null) {
+                    setStatusUI("Rejected", R.color.error, R.drawable.ic_error);
+                    setActionButton("Re-upload", true, doc);
+                    if (doc.getRejectionReason() != null && !doc.getRejectionReason().isEmpty()) {
                         tvRejectionReason.setText("Reason: " + doc.getRejectionReason());
                         tvRejectionReason.setVisibility(View.VISIBLE);
+                    } else {
+                        tvRejectionReason.setVisibility(View.GONE);
                     }
                     break;
-            }
 
-            // Required badge
-            boolean isRequired = isRequiredDocument(doc.getDocumentType());
-            // Could show a "Required" badge if needed
+                default:
+                    setStatusUI("Unknown", R.color.text_secondary, R.drawable.ic_upload);
+                    setActionButton("Upload", true, doc);
+                    tvRejectionReason.setVisibility(View.GONE);
+            }
+        }
+
+        private void setStatusUI(String text, int colorRes, int iconRes) {
+            int color = ContextCompat.getColor(itemView.getContext(), colorRes);
+            tvStatus.setText(text);
+            tvStatus.setTextColor(color);
+            ivStatus.setImageResource(iconRes);
+            ivStatus.setColorFilter(color);
+        }
+
+        private void setActionButton(String text, boolean isUpload, DocumentResponse doc) {
+            btnAction.setText(text);
+            btnAction.setOnClickListener(v -> {
+                animateClick(v);
+                v.postDelayed(() -> {
+                    if (isUpload) {
+                        listener.onUploadClick(doc);
+                    } else {
+                        listener.onViewClick(doc);
+                    }
+                }, 100);
+            });
+        }
+
+        private void animateClick(View v) {
+            // Animate the entire card for better feedback
+            cardView.animate()
+                .scaleX(0.98f).scaleY(0.98f)
+                .setDuration(50)
+                .withEndAction(() ->
+                    cardView.animate()
+                        .scaleX(1f).scaleY(1f)
+                        .setDuration(50)
+                        .start()
+                ).start();
         }
 
         private String getDocumentTitle(String type) {
+            if (type == null) return "Document";
             switch (type) {
                 case "profile_photo": return "Profile Photo";
                 case "national_id": return "National ID";
                 case "drivers_license": return "Driver's License";
                 case "vehicle_registration": return "Vehicle Registration";
-                case "vehicle_photo": return "Vehicle Photo (Optional)";
-                default: return type;
+                case "vehicle_photo": return "Vehicle Photo";
+                default: return formatTypeName(type);
             }
         }
 
+        private String formatTypeName(String type) {
+            // Convert snake_case to Title Case
+            String[] words = type.split("_");
+            StringBuilder sb = new StringBuilder();
+            for (String word : words) {
+                if (word.length() > 0) {
+                    sb.append(Character.toUpperCase(word.charAt(0)))
+                      .append(word.substring(1).toLowerCase())
+                      .append(" ");
+                }
+            }
+            return sb.toString().trim();
+        }
+
         private int getDocumentIcon(String type) {
+            if (type == null) return R.drawable.ic_description;
             switch (type) {
                 case "profile_photo": return R.drawable.ic_person;
                 case "national_id": return R.drawable.ic_badge;
@@ -151,6 +200,7 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.Docume
         }
 
         private boolean isRequiredDocument(String type) {
+            if (type == null) return true;
             return !type.equals("vehicle_photo");
         }
     }

@@ -1,39 +1,139 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- D-Nerve Driver App - Arabic strings.xml -->
+<!-- D-Nerve Driver App - Arabic Strings -->
+<!-- Location: app/src/main/res/values-ar/strings.xml -->
+
 <resources>
-    <!-- App Info -->
+    <!-- ============================================================== -->
+    <!-- APP INFO                                                        -->
+    <!-- ============================================================== -->
     <string name="app_name">D-Nerve سائق</string>
     <string name="app_tagline">قُد. اكسب. اربط القاهرة.</string>
 
-    <!-- Navigation -->
+    <!-- ============================================================== -->
+    <!-- NAVIGATION                                                      -->
+    <!-- ============================================================== -->
     <string name="nav_home">الرئيسية</string>
     <string name="nav_leaderboard">المتصدرين</string>
     <string name="nav_rewards">المكافآت</string>
     <string name="nav_profile">الملف الشخصي</string>
+    <string name="nav_back">رجوع</string>
 
-    <!-- Home Screen -->
+    <!-- ============================================================== -->
+    <!-- HOME SCREEN                                                     -->
+    <!-- ============================================================== -->
     <string name="home_welcome">مرحباً بعودتك!</string>
-    <string name="home_points_label">نقطة</string>
+    <string name="home_points_label">نقاط</string>
     <string name="home_today_stats">إحصائيات اليوم</string>
     <string name="home_quick_actions">إجراءات سريعة</string>
     <string name="home_view_history">عرض السجل</string>
     <string name="home_withdraw">سحب</string>
+    <string name="home_history_desc">عرض جميع رحلاتك السابقة</string>
+    <string name="home_rewards_desc">عرض الرصيد والسحب</string>
+    <string name="home_your_stats">إحصائياتك</string>
+    <string name="home_trip_history">سجل الرحلات</string>
+    <string name="home_trip_history_desc">عرض جميع رحلاتك السابقة</string>
+    <string name="home_rewards">المكافآت</string>
+    <string name="home_complete_trips_hint">أكمل رِحْلات لكسب نِقَاط!</string>
+    <string name="home_max_tier_reached">تم الوصول للمستوى الأقصى! 🎉</string>
 
-    <!-- Trip Recording -->
+    <!-- ============================================================== -->
+    <!-- TIME-BASED GREETINGS                                            -->
+    <!-- ============================================================== -->
+    <string name="greeting_morning">صباح الخير</string>
+    <string name="greeting_afternoon">مساء الخير</string>
+    <string name="greeting_evening">مساء الخير</string>
+    <string name="greeting_night">مساء الخير</string>
+
+    <!-- ============================================================== -->
+    <!-- TRIP RECORDING (StartTripActivity)                              -->
+    <!-- ============================================================== -->
     <string name="trip_start">بدء الرحلة</string>
-    <string name="trip_stop">إنهاء الرحلة</string>
+    <string name="select_route">اختر المسار</string>
+    <string name="enter_route">أدخل المسار</string>
+    <string name="popular_routes">المسارات الشائعة</string>
+    <string name="nearby_routes">المسارات القريبة</string>
+    <string name="routes_nearby">المسارات القريبة</string>
+    <string name="all_routes">جميع المسارات</string>
+    <string name="filter_nearby">📍 قريب</string>
+    <string name="filter_popular">🔥 شائع</string>
+    <string name="filter_all">جميع المسارات</string>
+    <string name="no_nearby_routes">لا توجد مسارات قريبة. جرب "جميع المسارات".</string>
+    <string name="no_routes_found">لا توجد مسارات</string>
+    <string name="current_location">الموقع الحالي</string>
+    <string name="start_location">نقطة البداية</string>
+    <string name="destination">الوجهة</string>
+    <string name="tap_to_use">انقر للاستخدام كنقطة بداية</string>
+    <string name="use">استخدام</string>
+    <string name="decrease">تقليل</string>
+    <string name="increase">زيادة</string>
+    <string name="estimated_time">الوقت المتوقع</string>
+    <string name="ai_predicted_eta">توقع الذكاء الاصطناعي</string>
+    <string name="error_select_route">الرجاء اختيار البداية والوجهة</string>
+
+    <!-- ============================================================== -->
+    <!-- TRIP ACTIVE (TripActivity)                                      -->
+    <!-- ============================================================== -->
     <string name="trip_active">رحلة نشطة</string>
     <string name="trip_paused">رحلة متوقفة</string>
-    <string name="trip_duration">المدة</string>
+    <string name="trip_stop">إنهاء الرحلة</string>
+    <string name="trip_duration">مدة الرحلة</string>
+    <string name="trip_duration_label">مدة الرحلة</string>
     <string name="trip_distance">المسافة</string>
     <string name="trip_gps_points">نقاط GPS</string>
     <string name="trip_quality">الجودة</string>
+    <string name="trip_traveled">تم قطع مسافة</string>
+    <string name="trip_remaining">المتبقي</string>
+    <string name="trip_speed">السرعة</string>
+    <string name="trip_est_points">النقاط المتوقعة</string>
+    <string name="trip_passengers">الركاب</string>
+    <string name="trip_eta_format">الوقت المتوقع: %1$s دقيقة</string>
+
+    <!-- Trip Stats Labels (short) -->
+    <string name="traveled">المسافة المقطوعة</string>
+    <string name="remaining">المتبقية</string>
+    <string name="speed">السرعة</string>
+    <string name="gps_points">نقاط GPS</string>
+    <string name="est_points">النقاط المتوقعة</string>
+    <string name="passengers">الركاب</string>
+    <string name="arriving">وصول</string>
+    <string name="starting_trip">بدء الرحلة…</string>
+    <string name="passing">عابر: %s</string>
+
+    <!-- Trip History Screen -->
+    <string name="history_trips">رحلات</string>
+    <string name="history_earned">مكتسب</string>
+    <string name="history_traveled">مسافة</string>
+    <string name="filter_this_week">هذا الأسبوع</string>
+    <string name="filter_this_month">هذا الشهر</string>
+    <string name="view_on_map">عرض على الخريطة</string>
+    <string name="quality">الجودة</string>
+    <string name="points">نقاط</string>
+
+    <!-- GPS Status -->
     <string name="trip_gps_status">حالة GPS</string>
     <string name="trip_gps_active">نشط</string>
+    <string name="trip_gps_active_label">GPS نشط</string>
     <string name="trip_gps_weak">إشارة ضعيفة</string>
-    <string name="trip_gps_off">GPS مغلق</string>
+    <string name="trip_gps_off">GPS متوقف</string>
+    <string name="gps_active">GPS نشط</string>
+    <string name="gps_waiting">انتظار...</string>
+    <string name="gps_off">GPS مغلق</string>
+    <string name="gps_excellent">ممتاز</string>
+    <string name="gps_good">جيد</string>
+    <string name="gps_fair">متوسط</string>
+    <string name="gps_weak">ضعيف</string>
 
-    <!-- Trip Summary -->
+    <!-- Offline Mode -->
+    <string name="offline_mode">وضع عدم الاتصال</string>
+    <string name="offline_mode_banner">📴 وضع عدم الاتصال - ستتم مزامنة الرحلة عند الاتصال</string>
+    <string name="offline_trip_saved">تم حفظ الرحلة - ستتم المزامنة عند الاتصال</string>
+    <string name="offline_syncing">جاري المزامنة…</string>
+    <string name="offline_sync_complete">اكتملت المزامنة</string>
+    <string name="offline_saved_banner">📴 تم حفظ الرحلة في وضع عدم الاتصال - ستتم المزامنة عند الاتصال</string>
+
+    <!-- ============================================================== -->
+    <!-- TRIP SUMMARY                                                    -->
+    <!-- ============================================================== -->
     <string name="trip_complete">اكتملت الرحلة!</string>
     <string name="trip_summary">ملخص الرحلة</string>
     <string name="trip_points_earned">النقاط المكتسبة</string>
@@ -41,46 +141,105 @@
     <string name="trip_points_breakdown">تفصيل النقاط</string>
     <string name="trip_base_points">النقاط الأساسية</string>
     <string name="trip_quality_bonus">مكافأة الجودة</string>
-    <string name="trip_peak_bonus">مكافأة ساعات الذروة</string>
+    <string name="trip_peak_bonus">مكافأة ساعة الذروة</string>
     <string name="trip_streak_bonus">مكافأة التتابع</string>
-    <string name="trip_total">المجموع</string>
+    <string name="trip_total">الإجمالي</string>
     <string name="trip_back_home">العودة للرئيسية</string>
+    <string name="trip_route_label">المسار</string>
 
-    <!-- Stats -->
+    <!-- ============================================================== -->
+    <!-- PASSENGER COUNT                                                 -->
+    <!-- ============================================================== -->
+    <string name="passenger_count">عدد الركاب</string>
+
+    <!-- ============================================================== -->
+    <!-- MAP                                                             -->
+    <!-- ============================================================== -->
+    <string name="map_start_marker">البداية</string>
+    <string name="map_end_marker">النهاية</string>
+    <string name="map_current_location">موقعك الحالي</string>
+    <string name="map_preview">معاينة الخريطة</string>
+
+    <!-- ============================================================== -->
+    <!-- STATS                                                           -->
+    <!-- ============================================================== -->
     <string name="stats_trips">الرحلات</string>
     <string name="stats_quality">الجودة</string>
     <string name="stats_streak">التتابع</string>
     <string name="stats_day_streak">يوم متتابع</string>
     <string name="stats_days_streak">أيام متتابعة</string>
+    <string name="stats_avg_quality">متوسط الجودة</string>
+    <string name="stats_total_trips">إجمالي الرحلات</string>
+    <string name="stats_total_points">إجمالي النقاط</string>
 
-    <!-- Tiers -->
+    <!-- ============================================================== -->
+    <!-- TIERS                                                           -->
+    <!-- ============================================================== -->
     <string name="tier_bronze">برونزي</string>
     <string name="tier_silver">فضي</string>
     <string name="tier_gold">ذهبي</string>
     <string name="tier_platinum">بلاتيني</string>
     <string name="tier_progress">%1$d / %2$d نقطة للوصول إلى %3$s</string>
     <string name="tier_driver">سائق %1$s</string>
+    <string name="tier_bronze_driver">سائق برونزي</string>
+    <string name="tier_silver_driver">سائق فضي</string>
+    <string name="tier_gold_driver">سائق ذهبي</string>
+    <string name="tier_platinum_driver">سائق بلاتيني</string>
 
-    <!-- Leaderboard -->
+    <!-- ============================================================== -->
+    <!-- LEADERBOARD                                                     -->
+    <!-- ============================================================== -->
     <string name="leaderboard_title">المتصدرين</string>
     <string name="leaderboard_your_rank">ترتيبك</string>
     <string name="leaderboard_top_drivers">أفضل السائقين</string>
     <string name="leaderboard_this_week">هذا الأسبوع</string>
     <string name="leaderboard_all_time">كل الأوقات</string>
-    <string name="leaderboard_by_points">بالنقاط</string>
-    <string name="leaderboard_by_quality">بالجودة</string>
-    <string name="leaderboard_by_trips">بالرحلات</string>
+    <string name="leaderboard_by_points">حسب النقاط</string>
+    <string name="leaderboard_by_quality">حسب الجودة</string>
+    <string name="leaderboard_by_trips">حسب الرحلات</string>
+    <string name="leaderboard_you">أنت</string>
+    <string name="leaderboard_others">سائقون آخرون</string>
+    <string name="leaderboard_login_required">سجل دخول لعرض لوحة المتصدرين</string>
+    <string name="leaderboard_offline">لوحة المتصدرين تتطلب اتصال بالإنترنت</string>
+    <string name="leaderboard_load_failed">فشل تحميل لوحة المتصدرين</string>
+    <string name="leaderboard_network_error">خطأ في الشبكة - تحقق من اتصالك</string>
+    <string name="leaderboard_no_data">لا توجد بيانات متاحة</string>
+    <string name="sort_points">النقاط</string>
+    <string name="sort_trips">الرحلات</string>
+    <string name="sort_streak">التتابع</string>
+    <string name="sort_quality">الجودة</string>
 
-    <!-- Rewards -->
+    <!-- ============================================================== -->
+    <!-- REWARDS                                                         -->
+    <!-- ============================================================== -->
     <string name="rewards_title">المكافآت</string>
     <string name="rewards_balance">الرصيد المتاح</string>
     <string name="rewards_withdraw">سحب</string>
-    <string name="rewards_history">سجل المعاملات</string>
-    <string name="rewards_pending">قيد الانتظار</string>
-    <string name="rewards_completed">مكتمل</string>
-    <string name="rewards_min_withdrawal">الحد الأدنى للسحب: %1$d نقطة</string>
+    <string name="rewards_total_earned">إجمالي المكتسب</string>
+    <string name="rewards_withdrawn">المسحوب</string>
+    <string name="rewards_how_it_works">كيف تعمل</string>
+    <string name="rewards_step_1">قُد واجمع بيانات GPS</string>
+    <string name="rewards_step_2">اكسب نُقَط للرحلات الجيدة</string>
+    <string name="rewards_step_3">10 نقاط = 1 جنيه</string>
+    <string name="rewards_step_4">اسحب عندما يكون الرصيد ≥ 5 جنيه</string>
+    <string name="rewards_history">سجل السحوبات</string>
+    <string name="rewards_no_withdrawals">لا توجد سحوبات بعد</string>
+    <string name="rewards_no_withdrawals_hint">سيظهر سجل السحوبات هنا</string>
+    <string name="rewards_weekly_earnings">الأرباح الأسبوعية</string>
+    <string name="rewards_no_earnings_data">لا توجد بيانات أرباح بعد</string>
 
-    <!-- Profile -->
+    <!-- ============================================================== -->
+    <!-- WITHDRAWAL                                                      -->
+    <!-- ============================================================== -->
+    <string name="dialog_withdraw_funds">سحب الأموال</string>
+    <string name="withdrawal_confirm_title">تأكيد السحب</string>
+    <string name="withdrawal_confirm_message">أنت على وشك سحب:\n\n💰 المبلغ: %1$s جنيه\n📱 الطريقة: %2$s\n🔢 الحساب: %3$s\n\nسيتم خصم %4$d نقطة من رصيدك.\n\nهل تريد المتابعة؟</string>
+    <string name="withdrawal_success">تم إرسال طلب السحب!</string>
+    <string name="withdrawal_failed">فشل السحب. حاول مرة أخرى.</string>
+
+    <!-- ============================================================== -->
+    <!-- PROFILE                                                         -->
+    <!-- ============================================================== -->
     <string name="profile_title">الملف الشخصي</string>
     <string name="profile_edit">تعديل الملف</string>
     <string name="profile_personal_info">المعلومات الشخصية</string>
@@ -94,20 +253,52 @@
     <string name="profile_vehicle_type">نوع المركبة</string>
     <string name="profile_plate_number">رقم اللوحة</string>
     <string name="profile_member_since">عضو منذ %1$s</string>
+    <string name="profile_documents">مستندات السائق</string>
+    <string name="profile_change_photo">تغيير الصورة</string>
+    <string name="profile_section_account">الحساب</string>
+    <string name="profile_section_achievements">الإنجازات والمستندات</string>
+    <string name="profile_section_personal">المعلومات الشخصية</string>
+    <string name="profile_section_vehicle">معلومات المركبة</string>
+    <string name="profile_section_app">التطبيق</string>
+    <string name="profile_tier_progress">تقدم المستوى</string>
 
-    <!-- Auth -->
+    <!-- ============================================================== -->
+    <!-- AUTHENTICATION                                                  -->
+    <!-- ============================================================== -->
     <string name="auth_login">تسجيل الدخول</string>
     <string name="auth_register">إنشاء حساب</string>
+    <string name="auth_email">البريد الإلكتروني</string>
     <string name="auth_phone_number">رقم الهاتف</string>
     <string name="auth_password">كلمة المرور</string>
     <string name="auth_confirm_password">تأكيد كلمة المرور</string>
     <string name="auth_forgot_password">نسيت كلمة المرور؟</string>
     <string name="auth_no_account">ليس لديك حساب؟</string>
-    <string name="auth_has_account">لديك حساب بالفعل؟</string>
+    <string name="auth_has_account">لديك حساب فعلًا؟</string>
     <string name="auth_sign_up">إنشاء حساب</string>
     <string name="auth_sign_in">تسجيل الدخول</string>
+    <string name="auth_welcome_back">مرحباً بعودتك</string>
+    <string name="auth_create_account">إنشاء حساب</string>
+    <string name="auth_join_tagline">انضم إلى D-Nerve وابدأ في كسب المكافآت</string>
+    <string name="auth_remember_me">تذكرني</string>
+    <string name="auth_country">الدولة</string>
+    <string name="auth_code">الكود</string>
+    <string name="auth_toggle_password">إظهار/إخفاء كلمة المرور</string>
+    <string name="auth_country_code_desc">اختر كود الدولة</string>
+    <string name="auth_password_hint">٦ أحرف على الأقل مع رقم واحد</string>
+    <string name="auth_welcome_message">مرحباً بعودتك، %1$s!</string>
+    <string name="auth_register_success">مرحباً بك في دي-نيرف، %1$s!</string>
 
-    <!-- Settings -->
+    <!-- Password Reset -->
+    <string name="auth_forgot_password_title">نسيت كلمة المرور</string>
+    <string name="auth_forgot_password_subtitle">أدخل بريدك الإلكتروني لاستلام رمز إعادة التعيين</string>
+    <string name="auth_send_reset_code">إرسال رمز إعادة التعيين</string>
+    <string name="auth_reset_code">رمز إعادة التعيين</string>
+    <string name="auth_new_password">كلمة المرور الجديدة</string>
+    <string name="auth_reset_password">إعادة تعيين كلمة المرور</string>
+
+    <!-- ============================================================== -->
+    <!-- SETTINGS                                                        -->
+    <!-- ============================================================== -->
     <string name="settings_title">الإعدادات</string>
     <string name="settings_notifications">الإشعارات</string>
     <string name="settings_location">إعدادات الموقع</string>
@@ -117,63 +308,182 @@
     <string name="settings_terms">شروط الخدمة</string>
     <string name="settings_support">الدعم</string>
     <string name="settings_version">الإصدار %1$s</string>
+    <string name="settings_dark_mode">الوضع الليلي</string>
+    <string name="settings_appearance">المظهر</string>
+    <string name="settings_gps">إعدادات GPS</string>
+    <string name="settings_gps_accuracy">دقة GPS</string>
+    <string name="settings_gps_accuracy_hint">الدقة العالية تستهلك بطارية أكثر</string>
+    <string name="settings_gps_battery_saver">توفير البطارية</string>
+    <string name="settings_gps_balanced">متوازن</string>
+    <string name="settings_gps_high_accuracy">دقة عالية</string>
+    <string name="settings_gps_updated">تم تحديث دقة GPS</string>
+    <string name="settings_update_interval">فترة التحديث</string>
+    <string name="settings_update_interval_hint">عدد مرات تسجيل الموقع</string>
+    <string name="settings_interval_5s">5 ثواني</string>
+    <string name="settings_interval_10s">10 ثواني</string>
+    <string name="settings_interval_15s">15 ثانية</string>
+    <string name="settings_interval_30s">30 ثانية</string>
+    <string name="settings_interval_updated">تم تحديث فترة التحديث</string>
 
-    <!-- Permissions -->
-    <string name="permission_location_title">إذن الموقع مطلوب</string>
-    <string name="permission_location_message">يحتاج D-Nerve إلى الوصول للموقع لتتبع رحلاتك وحساب أرباحك.</string>
-    <string name="permission_location_background_title">الموقع في الخلفية</string>
-    <string name="permission_location_background_message">اسمح بالوصول للموقع طوال الوقت لتتبع الرحلات حتى عندما يكون التطبيق في الخلفية.</string>
-    <string name="permission_grant">منح الإذن</string>
+    <string name="settings_push_notifications">الإشعارات الفورية</string>
+    <string name="settings_push_notifications_hint">استقبال إشعارات التطبيق</string>
+    <string name="settings_trip_reminders">تذكيرات الرحلات</string>
+    <string name="settings_trip_reminders_hint">تذكير ببدء تتبع الرحلات</string>
+    <string name="settings_reward_alerts">تنبيهات المكافآت</string>
+    <string name="settings_reward_alerts_hint">إعلامك عند توفر مكافآت</string>
+
+    <string name="settings_data_storage">البيانات والتخزين</string>
+    <string name="settings_auto_sync">مزامنة تلقائية</string>
+    <string name="settings_auto_sync_hint">مزامنة بيانات الرحلات تلقائياً</string>
+    <string name="settings_wifi_only">واي فاي فقط</string>
+    <string name="settings_wifi_only_hint">المزامنة عند الاتصال بالواي فاي فقط</string>
+
+    <string name="settings_dark_mode_hint">التبديل إلى السمة الداكنة</string>
+    <string name="settings_language_hint">اختر لغة التطبيق</string>
+    <string name="settings_app_version">إصدار التطبيق</string>
+
+    <string name="error_open_link">تعذر فتح الرابط</string>
+    <string name="logging_out">جاري تسجيل الخروج…</string>
+    <string name="logout_confirm_message">هل أنت متأكد من تسجيل الخروج؟</string>
+
+    <!-- ============================================================== -->
+    <!-- DOCUMENTS                                                       -->
+    <!-- ============================================================== -->
+    <string name="documents_title">المستندات</string>
+    <string name="documents_upload">رفع مستند</string>
+    <string name="documents_driving_license">رخصة القيادة</string>
+    <string name="documents_vehicle_license">رخصة المركبة</string>
+    <string name="documents_national_id">البطاقة الشخصية</string>
+    <string name="documents_vehicle_photo">صورة المركبة</string>
+    <string name="documents_profile_photo">الصورة الشخصية</string>
+    <string name="documents_pending">قيد المراجعة</string>
+    <string name="documents_verified">تم التحقق</string>
+    <string name="documents_rejected">مرفوض</string>
+
+    <!-- ============================================================== -->
+    <!-- ACHIEVEMENTS                                                    -->
+    <!-- ============================================================== -->
+    <string name="achievements_title">الإنجازات</string>
+    <string name="achievements_earned">مكتسبة</string>
+    <string name="achievements_all">الكل</string>
+    <string name="achievements_trips">الرحلات</string>
+    <string name="achievements_quality">الجودة</string>
+    <string name="achievements_streak">السلسلة</string>
+    <string name="achievements_points">النقاط</string>
+    <string name="achievements_empty_title">لا توجد شارات بعد</string>
+    <string name="achievements_empty_message">أكمل الرِّحْلات والتحديات لكسب الشارات!</string>
+
+    <!-- ============================================================== -->
+    <!-- PERMISSIONS                                                     -->
+    <!-- ============================================================== -->
+    <string name="permission_location_title">صلاحية الموقع مطلوبة</string>
+    <string name="permission_location_message">يحتاج D-Nerve الوصول للموقع لتتبع رحلاتك وحساب أرباحك.</string>
+    <string name="permission_location_background_title">موقع الخلفية</string>
+    <string name="permission_location_background_message">اسمح بالوصول للموقع طوال الوقت لتتبع الرِّحْلات حتى عندما يكون التطبيق في الخلفية.</string>
+    <string name="permission_grant">منح الصلاحية</string>
     <string name="permission_deny">رفض</string>
 
-    <!-- Errors -->
+    <!-- ============================================================== -->
+    <!-- NOTIFICATIONS                                                   -->
+    <!-- ============================================================== -->
+    <string name="notification_channel_trip">تتبع الرحلة</string>
+    <string name="notification_channel_trip_desc">يظهر عند تسجيل رحلة</string>
+    <string name="notification_trip_active">جاري تسجيل الرحلة…</string>
+    <string name="notification_trip_tap_stop">اضغط للإيقاف</string>
+
+    <!-- ============================================================== -->
+    <!-- LOGOUT                                                          -->
+    <!-- ============================================================== -->
+    <string name="logout_title">تسجيل الخروج</string>
+    <string name="logout_message">هل أنت متأكد أنك تريد تسجيل الخروج؟</string>
+    <string name="logout_confirm">خروج</string>
+    <string name="logout_success">تم تسجيل الخروج بنجاح</string>
+    <string name="logout">تسجيل الخروج</string>
+
+    <!-- ============================================================== -->
+    <!-- ERRORS                                                          -->
+    <!-- ============================================================== -->
     <string name="error_generic">حدث خطأ ما. يرجى المحاولة مرة أخرى.</string>
     <string name="error_network">لا يوجد اتصال بالإنترنت. يرجى التحقق من الشبكة.</string>
     <string name="error_location">تعذر الحصول على موقعك. يرجى تفعيل GPS.</string>
     <string name="error_login">بيانات غير صحيحة. يرجى المحاولة مرة أخرى.</string>
     <string name="error_empty_field">هذا الحقل مطلوب</string>
-    <string name="error_invalid_phone">يرجى إدخال رقم هاتف صحيح</string>
+    <string name="error_invalid_phone">يرجى إدخال رَقَم هاتف صحيح</string>
     <string name="error_password_mismatch">كلمات المرور غير متطابقة</string>
-    <string name="error_password_weak">يجب أن تكون كلمة المرور 6 أحرف على الأقل</string>
+    <string name="error_password_weak">كلمة المرور يجب أن تكون 6 أحرف على الأقل</string>
+    <string name="error_invalid_amount">مبلغ غير صالح</string>
+    <string name="error_insufficient_balance">يتجاوز الرصيد المتاح</string>
+    <string name="error_select_payment_method">اختر طريقة الدفع</string>
+    <string name="error_enter_amount">أدخل المبلغ</string>
+    <string name="error_enter_account">أدخل رقم الحساب</string>
 
-    <!-- Success Messages -->
+    <!-- Auth Errors -->
+    <string name="error_email_required">البريد الإلكتروني مطلوب</string>
+    <string name="error_email_invalid">أدخل بريد إلكتروني صحيح</string>
+    <string name="error_password_required">كلمة المرور مطلوبة</string>
+    <string name="error_password_short">٦ أحرف على الأقل</string>
+    <string name="error_password_no_number">يجب أن تحتوي على رقم واحد على الأقل</string>
+    <string name="error_confirm_password">يرجى تأكيد كلمة المرور</string>
+    <string name="error_name_required">الاسم مطلوب</string>
+    <string name="error_name_short">الاسم قصير جداً</string>
+    <string name="error_phone_required">الهاتف مطلوب</string>
+    <string name="error_phone_short">رقم الهاتف قصير جداً</string>
+    <string name="error_license_required">رقم اللوحة مطلوب</string>
+    <string name="error_login_failed">فشل تسجيل الدخول</string>
+    <string name="error_invalid_credentials">بريد إلكتروني أو كلمة مرور غير صحيحة</string>
+    <string name="error_account_not_found">الحساب غير موجود</string>
+    <string name="error_registration_failed">فشل التسجيل</string>
+    <string name="error_email_exists">البريد الإلكتروني مسجل مسبقاً</string>
+    <string name="error_phone_exists">رقم الهاتف مسجل مسبقاً</string>
+
+    <!-- ============================================================== -->
+    <!-- SUCCESS MESSAGES                                                -->
+    <!-- ============================================================== -->
     <string name="success_trip_submitted">تم إرسال الرحلة بنجاح!</string>
-    <string name="success_profile_updated">تم تحديث الملف الشخصي بنجاح!</string>
+    <string name="success_profile_updated">تم تحديث المِلَفّ الشخصي بنجاح!</string>
     <string name="success_withdrawal_requested">تم إرسال طلب السحب!</string>
 
-    <!-- Buttons -->
+    <!-- ============================================================== -->
+    <!-- BUTTONS                                                         -->
+    <!-- ============================================================== -->
     <string name="btn_ok">موافق</string>
     <string name="btn_cancel">إلغاء</string>
     <string name="btn_retry">إعادة المحاولة</string>
     <string name="btn_save">حفظ</string>
     <string name="btn_confirm">تأكيد</string>
     <string name="btn_continue">متابعة</string>
+    <string name="retry">إعادة المحاولة</string>
+    <string name="loading">جاري التحميل…</string>
 
-    <!-- Time Formats -->
+    <!-- ============================================================== -->
+    <!-- TIME FORMATS                                                    -->
+    <!-- ============================================================== -->
     <string name="time_format_hms">%1$02d:%2$02d:%3$02d</string>
     <string name="time_format_ms">%1$02d:%2$02d</string>
     <string name="time_minutes">%1$d دقيقة</string>
     <string name="time_hours">%1$d ساعة</string>
 
-    <!-- Distance -->
+    <!-- ============================================================== -->
+    <!-- DISTANCE                                                        -->
+    <!-- ============================================================== -->
     <string name="distance_km">%1$.1f كم</string>
     <string name="distance_m">%1$d م</string>
 
-    <!-- Quality Labels -->
+    <!-- ============================================================== -->
+    <!-- QUALITY LABELS                                                  -->
+    <!-- ============================================================== -->
     <string name="quality_excellent">ممتاز</string>
     <string name="quality_good">جيد</string>
     <string name="quality_fair">مقبول</string>
     <string name="quality_poor">ضعيف</string>
 
-    <!-- Empty States -->
-    <string name="empty_trips">لا توجد رحلات بعد</string>
+    <!-- ============================================================== -->
+    <!-- EMPTY STATES                                                    -->
+    <!-- ============================================================== -->
+    <string name="empty_trips">لا توجد رِحْلات بعد</string>
     <string name="empty_trips_hint">ابدأ رحلتك الأولى لتظهر هنا!</string>
     <string name="empty_rewards">لا توجد معاملات بعد</string>
     <string name="empty_leaderboard">لا توجد بيانات متاحة</string>
+    <string name="empty_history_hint">ابدأ رحلة لرؤية سجلك هنا</string>
 
-    <!-- Notifications -->
-    <string name="notification_channel_trip">تتبع الرحلة</string>
-    <string name="notification_channel_trip_desc">يظهر عند تسجيل رحلة</string>
-    <string name="notification_trip_active">جاري تسجيل الرحلة…</string>
-    <string name="notification_trip_tap_stop">اضغط للإيقاف</string>
 </resources>

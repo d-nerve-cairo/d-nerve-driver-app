@@ -2,7 +2,9 @@ package com.example.dnervecairo.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Patterns;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -13,11 +15,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.dnervecairo.MainActivity;
 import com.example.dnervecairo.R;
 import com.example.dnervecairo.api.ApiClient;
-import com.example.dnervecairo.api.responses.DriverResponse;
-import com.example.dnervecairo.api.responses.DriversListResponse;  // ADD THIS
+import com.example.dnervecairo.api.requests.LoginRequest;
+import com.example.dnervecairo.api.responses.LoginResponse;
+import com.example.dnervecairo.services.DNerveFirebaseMessagingService;
 import com.example.dnervecairo.utils.PreferenceManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -25,9 +29,13 @@ import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private TextInputEditText etPhone;
+    private TextInputLayout tilEmail, tilPassword;
+    private TextInputEditText etEmail, etPassword;
+    private CheckBox cbRememberMe;
     private MaterialButton btnLogin;
     private ProgressBar progressBar;
+    private TextView tvForgotPassword, tvRegister;
+    
     private PreferenceManager prefManager;
 
     @Override
@@ -45,77 +53,154 @@ public class LoginActivity extends AppCompatActivity {
 
         initViews();
         setupListeners();
+        loadSavedCredentials();
     }
 
     private void initViews() {
-        etPhone = findViewById(R.id.et_phone);
+        tilEmail = findViewById(R.id.til_email);
+        tilPassword = findViewById(R.id.til_password);
+        etEmail = findViewById(R.id.et_email);
+        etPassword = findViewById(R.id.et_password);
+        cbRememberMe = findViewById(R.id.cb_remember_me);
         btnLogin = findViewById(R.id.btn_login);
         progressBar = findViewById(R.id.progress_bar);
+        tvForgotPassword = findViewById(R.id.tv_forgot_password);
+        tvRegister = findViewById(R.id.tv_register);
     }
 
     private void setupListeners() {
+        // Login button
         btnLogin.setOnClickListener(v -> attemptLogin());
 
-        TextView tvRegister = findViewById(R.id.tv_register);
+        // Forgot password
+        tvForgotPassword.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ForgotPasswordActivity.class);
+            startActivity(intent);
+        });
+
+        // Register link
         tvRegister.setOnClickListener(v -> {
             startActivity(new Intent(this, RegisterActivity.class));
         });
+
+        // Clear errors on focus
+        etEmail.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) tilEmail.setError(null);
+        });
+        etPassword.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) tilPassword.setError(null);
+        });
+    }
+
+    private void loadSavedCredentials() {
+        // Load remembered email if exists
+        String savedEmail = prefManager.getSavedEmail();
+        if (savedEmail != null && !savedEmail.isEmpty()) {
+            etEmail.setText(savedEmail);
+            cbRememberMe.setChecked(true);
+        }
     }
 
     private void attemptLogin() {
-        String phone = etPhone.getText().toString().trim();
+        // Clear previous errors
+        tilEmail.setError(null);
+        tilPassword.setError(null);
+
+        String email = etEmail.getText().toString().trim();
+        String password = etPassword.getText().toString();
 
         // Validation
-        if (phone.isEmpty()) {
-            etPhone.setError("Phone required");
+        if (email.isEmpty()) {
+            tilEmail.setError(getString(R.string.error_email_required));
+            etEmail.requestFocus();
             return;
         }
-        if (phone.length() < 10) {
-            etPhone.setError("Invalid phone number");
+        
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            tilEmail.setError(getString(R.string.error_email_invalid));
+            etEmail.requestFocus();
+            return;
+        }
+
+        if (password.isEmpty()) {
+            tilPassword.setError(getString(R.string.error_password_required));
+            etPassword.requestFocus();
+            return;
+        }
+
+        if (password.length() < 6) {
+            tilPassword.setError(getString(R.string.error_password_short));
+            etPassword.requestFocus();
             return;
         }
 
         // Show loading
         setLoading(true);
 
-        // Search for driver by phone using the list endpoint
+        // Create login request
+        LoginRequest request = LoginRequest.withEmail(email, password);
+
         ApiClient.getInstance().getApiService()
-                .getDrivers()
-                .enqueue(new Callback<DriversListResponse>() {
+                .loginDriver(request)
+                .enqueue(new Callback<LoginResponse>() {
                     @Override
-                    public void onResponse(@NonNull Call<DriversListResponse> call, @NonNull Response<DriversListResponse> response) {
+                    public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {
                         setLoading(false);
 
                         if (response.isSuccessful() && response.body() != null) {
-                            // Find driver with matching phone
-                            DriverResponse foundDriver = null;
-                            for (DriverResponse driver : response.body().getDrivers()) {
-                                if (phone.equals(driver.getPhone())) {
-                                    foundDriver = driver;
-                                    break;
-                                }
-                            }
+                            LoginResponse.DriverData driver = response.body().getDriver();
+                            
+                            // Save driver info
+                            prefManager.saveDriverId(driver.getDriverId());
+                            prefManager.saveDriverName(driver.getName());
+                            prefManager.setLoggedIn(true);
+                            
+                            // Save additional data
+                            prefManager.saveDriverData(
+                                driver.getName(),
+                                driver.getTotalPoints(),
+                                driver.getTier(),
+                                driver.getTripsCompleted(),
+                                driver.getQualityAvg(),
+                                driver.getCurrentStreak()
+                            );
 
-                            if (foundDriver != null) {
-                                // Save driver info
-                                prefManager.saveDriverId(foundDriver.getDriverId());
-                                prefManager.saveDriverName(foundDriver.getName());
-                                prefManager.setLoggedIn(true);
-
-                                Toast.makeText(LoginActivity.this, "Welcome back, " + foundDriver.getName() + "!", Toast.LENGTH_SHORT).show();
-                                goToMain();
+                            // Remember email if checked
+                            if (cbRememberMe.isChecked()) {
+                                prefManager.saveEmail(email);
                             } else {
-                                Toast.makeText(LoginActivity.this, "Phone not registered. Please register first.", Toast.LENGTH_SHORT).show();
+                                prefManager.clearSavedEmail();
                             }
+
+                            // P5d: Upload FCM token to backend now that we have a driver_id
+                            String cachedToken = prefManager.getFcmToken();
+                            if (cachedToken != null) {
+                                DNerveFirebaseMessagingService.uploadTokenToServer(
+                                        driver.getDriverId(), cachedToken);
+                            }
+
+                            Toast.makeText(LoginActivity.this,
+                                getString(R.string.auth_welcome_message, driver.getName()),
+                                Toast.LENGTH_SHORT).show();
+                            goToMain();
                         } else {
-                            Toast.makeText(LoginActivity.this, "Login failed. Try again.", Toast.LENGTH_SHORT).show();
+                            // Parse error message
+                            String errorMsg = getString(R.string.error_login_failed);
+                            if (response.code() == 401) {
+                                errorMsg = getString(R.string.error_invalid_credentials);
+                            } else if (response.code() == 404) {
+                                errorMsg = getString(R.string.error_account_not_found);
+                            }
+                            tilPassword.setError(errorMsg);
                         }
                     }
 
                     @Override
-                    public void onFailure(@NonNull Call<DriversListResponse> call, @NonNull Throwable t) {
+                    public void onFailure(@NonNull Call<LoginResponse> call, @NonNull Throwable t) {
                         setLoading(false);
-                        Toast.makeText(LoginActivity.this, "Network error. Try again.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, 
+                            getString(R.string.error_network), 
+                            Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -123,6 +208,7 @@ public class LoginActivity extends AppCompatActivity {
     private void setLoading(boolean loading) {
         progressBar.setVisibility(loading ? View.VISIBLE : View.GONE);
         btnLogin.setEnabled(!loading);
+        btnLogin.setText(loading ? "" : getString(R.string.auth_login));
     }
 
     private void goToMain() {

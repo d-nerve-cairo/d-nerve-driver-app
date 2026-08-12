@@ -5,9 +5,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.view.View;
-import android.widget.ProgressBar;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +34,7 @@ import com.example.dnervecairo.api.responses.DocumentUploadResponse;
 import com.example.dnervecairo.utils.PreferenceManager;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 import java.io.File;
@@ -48,16 +52,24 @@ public class DocumentsActivity extends AppCompatActivity implements DocumentAdap
 
     private static final int CAMERA_PERMISSION_REQUEST = 100;
 
+    // Views
     private RecyclerView recyclerView;
     private DocumentAdapter adapter;
     private SwipeRefreshLayout swipeRefresh;
-    private ProgressBar progressBar;
+    private View progressOverlay;
     private TextView tvVerificationStatus, tvProgress;
     private LinearProgressIndicator progressIndicator;
+    
+    // Cards for animation
+    private MaterialCardView cardStatus;
+    private LinearLayout layoutDocumentsHeader;
 
+    // Data
     private PreferenceManager prefManager;
     private String currentDocumentType;
     private Uri cameraImageUri;
+    private final Handler handler = new Handler(Looper.getMainLooper());
+    private boolean isFirstLoad = true;
 
     // Activity result launchers
     private final ActivityResultLauncher<Intent> galleryLauncher = registerForActivityResult(
@@ -92,21 +104,92 @@ public class DocumentsActivity extends AppCompatActivity implements DocumentAdap
         setupToolbar();
         setupRecyclerView();
         setupSwipeRefresh();
+        prepareEntranceAnimations();
         loadDocuments();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        handler.removeCallbacksAndMessages(null);
     }
 
     private void initViews() {
         recyclerView = findViewById(R.id.rv_documents);
         swipeRefresh = findViewById(R.id.swipe_refresh);
-        progressBar = findViewById(R.id.progress_bar);
+        progressOverlay = findViewById(R.id.progress_overlay);
         tvVerificationStatus = findViewById(R.id.tv_verification_status);
         tvProgress = findViewById(R.id.tv_progress);
         progressIndicator = findViewById(R.id.progress_indicator);
+        cardStatus = findViewById(R.id.card_status);
+        layoutDocumentsHeader = findViewById(R.id.layout_documents_header);
+    }
+
+    private void prepareEntranceAnimations() {
+        if (cardStatus != null) {
+            cardStatus.setAlpha(0f);
+            cardStatus.setTranslationY(30f);
+        }
+        if (layoutDocumentsHeader != null) {
+            layoutDocumentsHeader.setAlpha(0f);
+        }
+    }
+
+    private void playEntranceAnimations() {
+        if (!isFirstLoad) return;
+        isFirstLoad = false;
+
+        // Status card
+        if (cardStatus != null) {
+            cardStatus.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(400)
+                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .start();
+        }
+
+        // Documents header
+        handler.postDelayed(() -> {
+            if (layoutDocumentsHeader != null) {
+                layoutDocumentsHeader.animate()
+                    .alpha(1f)
+                    .setDuration(300)
+                    .start();
+            }
+        }, 200);
+
+        // Animate list items
+        handler.postDelayed(this::animateListItems, 300);
+    }
+
+    private void animateListItems() {
+        recyclerView.post(() -> {
+            for (int i = 0; i < recyclerView.getChildCount(); i++) {
+                View child = recyclerView.getChildAt(i);
+                if (child != null) {
+                    child.setAlpha(0f);
+                    child.setTranslationX(50f);
+                    final int delay = i * 80;
+                    handler.postDelayed(() -> {
+                        child.animate()
+                            .alpha(1f)
+                            .translationX(0f)
+                            .setDuration(350)
+                            .setInterpolator(new AccelerateDecelerateInterpolator())
+                            .start();
+                    }, delay);
+                }
+            }
+        });
     }
 
     private void setupToolbar() {
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setNavigationOnClickListener(v -> finish());
+        toolbar.setNavigationOnClickListener(v -> {
+            animateClick(v);
+            handler.postDelayed(this::finish, 100);
+        });
     }
 
     private void setupRecyclerView() {
@@ -116,12 +199,12 @@ public class DocumentsActivity extends AppCompatActivity implements DocumentAdap
     }
 
     private void setupSwipeRefresh() {
-        swipeRefresh.setColorSchemeResources(R.color.primary);
+        swipeRefresh.setColorSchemeResources(R.color.primary, R.color.accent);
         swipeRefresh.setOnRefreshListener(this::loadDocuments);
     }
 
     private void loadDocuments() {
-        progressBar.setVisibility(View.VISIBLE);
+        progressOverlay.setVisibility(View.VISIBLE);
 
         ApiClient.getInstance().getApiService()
                 .getDriverDocuments(prefManager.getDriverId())
@@ -129,23 +212,22 @@ public class DocumentsActivity extends AppCompatActivity implements DocumentAdap
                     @Override
                     public void onResponse(@NonNull Call<DocumentsStatusResponse> call,
                                            @NonNull Response<DocumentsStatusResponse> response) {
-                        progressBar.setVisibility(View.GONE);
+                        progressOverlay.setVisibility(View.GONE);
                         swipeRefresh.setRefreshing(false);
 
                         if (response.isSuccessful() && response.body() != null) {
                             displayDocuments(response.body());
+                            playEntranceAnimations();
                         } else {
-                            Toast.makeText(DocumentsActivity.this,
-                                    "Failed to load documents", Toast.LENGTH_SHORT).show();
+                            showToast("Failed to load documents");
                         }
                     }
 
                     @Override
                     public void onFailure(@NonNull Call<DocumentsStatusResponse> call, @NonNull Throwable t) {
-                        progressBar.setVisibility(View.GONE);
+                        progressOverlay.setVisibility(View.GONE);
                         swipeRefresh.setRefreshing(false);
-                        Toast.makeText(DocumentsActivity.this,
-                                "Network error", Toast.LENGTH_SHORT).show();
+                        showToast("Network error");
                     }
                 });
     }
@@ -158,28 +240,36 @@ public class DocumentsActivity extends AppCompatActivity implements DocumentAdap
 
         tvProgress.setText(uploaded + "/" + required + " documents");
         progressIndicator.setMax(required);
-        progressIndicator.setProgress(uploaded);
+        
+        // Animate progress
+        animateProgress(uploaded);
 
         // Status text and color
         switch (status) {
             case "verified":
-                tvVerificationStatus.setText("✅ Verified");
-                tvVerificationStatus.setTextColor(getResources().getColor(R.color.success, null));
+                tvVerificationStatus.setText("✓ Verified");
+                tvVerificationStatus.setTextColor(ContextCompat.getColor(this, R.color.success));
                 break;
             case "pending":
-                tvVerificationStatus.setText("🕐 Pending Review");
-                tvVerificationStatus.setTextColor(getResources().getColor(R.color.warning, null));
+                tvVerificationStatus.setText("⏳ Pending Review");
+                tvVerificationStatus.setTextColor(ContextCompat.getColor(this, R.color.warning));
                 break;
             case "rejected":
-                tvVerificationStatus.setText("❌ Rejected");
-                tvVerificationStatus.setTextColor(getResources().getColor(R.color.error, null));
+                tvVerificationStatus.setText("✗ Rejected");
+                tvVerificationStatus.setTextColor(ContextCompat.getColor(this, R.color.error));
                 break;
             default:
                 tvVerificationStatus.setText("📋 Incomplete");
-                tvVerificationStatus.setTextColor(getResources().getColor(R.color.text_secondary, null));
+                tvVerificationStatus.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
         }
 
         adapter.setDocuments(data.getDocuments());
+    }
+
+    private void animateProgress(int target) {
+        handler.postDelayed(() -> {
+            progressIndicator.setProgressCompat(target, true);
+        }, 400);
     }
 
     @Override
@@ -190,22 +280,36 @@ public class DocumentsActivity extends AppCompatActivity implements DocumentAdap
 
     @Override
     public void onViewClick(DocumentResponse document) {
-        // TODO: Open document viewer
-        Toast.makeText(this, "View: " + document.getFileName(), Toast.LENGTH_SHORT).show();
+        // Show document info
+        String fileName = document.getFileName();
+        if (fileName != null && !fileName.isEmpty()) {
+            showToast("Document: " + fileName);
+        } else {
+            showToast("Document uploaded successfully");
+        }
     }
 
     private void showImageSourceDialog() {
         BottomSheetDialog dialog = new BottomSheetDialog(this);
         View view = getLayoutInflater().inflate(R.layout.dialog_image_source, null);
 
-        view.findViewById(R.id.btn_camera).setOnClickListener(v -> {
-            dialog.dismiss();
-            openCamera();
+        View btnCamera = view.findViewById(R.id.btn_camera);
+        View btnGallery = view.findViewById(R.id.btn_gallery);
+
+        btnCamera.setOnClickListener(v -> {
+            animateClick(v);
+            handler.postDelayed(() -> {
+                dialog.dismiss();
+                openCamera();
+            }, 100);
         });
 
-        view.findViewById(R.id.btn_gallery).setOnClickListener(v -> {
-            dialog.dismiss();
-            openGallery();
+        btnGallery.setOnClickListener(v -> {
+            animateClick(v);
+            handler.postDelayed(() -> {
+                dialog.dismiss();
+                openGallery();
+            }, 100);
         });
 
         dialog.setContentView(view);
@@ -240,19 +344,22 @@ public class DocumentsActivity extends AppCompatActivity implements DocumentAdap
         if (requestCode == CAMERA_PERMISSION_REQUEST) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 openCamera();
+            } else {
+                showToast("Camera permission required");
             }
         }
     }
 
     private void uploadDocument(Uri imageUri) {
-        progressBar.setVisibility(View.VISIBLE);
+        progressOverlay.setVisibility(View.VISIBLE);
+        showToast("Uploading...");
 
         try {
             // Convert URI to File
             File file = createTempFileFromUri(imageUri);
             if (file == null) {
-                Toast.makeText(this, "Failed to process image", Toast.LENGTH_SHORT).show();
-                progressBar.setVisibility(View.GONE);
+                showToast("Failed to process image");
+                progressOverlay.setVisibility(View.GONE);
                 return;
             }
 
@@ -267,35 +374,51 @@ public class DocumentsActivity extends AppCompatActivity implements DocumentAdap
                         @Override
                         public void onResponse(@NonNull Call<DocumentUploadResponse> call,
                                                @NonNull Response<DocumentUploadResponse> response) {
-                            progressBar.setVisibility(View.GONE);
+                            progressOverlay.setVisibility(View.GONE);
 
                             if (response.isSuccessful() && response.body() != null) {
-                                Toast.makeText(DocumentsActivity.this,
-                                        "✅ " + response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                                showToast("✓ " + response.body().getMessage());
+                                // Animate success
+                                showUploadSuccess();
                                 loadDocuments(); // Refresh list
                             } else {
-                                Toast.makeText(DocumentsActivity.this,
-                                        "Upload failed", Toast.LENGTH_SHORT).show();
+                                showToast("Upload failed");
                             }
                         }
 
                         @Override
                         public void onFailure(@NonNull Call<DocumentUploadResponse> call, @NonNull Throwable t) {
-                            progressBar.setVisibility(View.GONE);
-                            Toast.makeText(DocumentsActivity.this,
-                                    "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                            progressOverlay.setVisibility(View.GONE);
+                            showToast("Network error: " + t.getMessage());
                         }
                     });
 
         } catch (Exception e) {
-            progressBar.setVisibility(View.GONE);
-            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            progressOverlay.setVisibility(View.GONE);
+            showToast("Error: " + e.getMessage());
+        }
+    }
+
+    private void showUploadSuccess() {
+        // Brief success animation on status card
+        if (cardStatus != null) {
+            cardStatus.animate()
+                .scaleX(1.02f).scaleY(1.02f)
+                .setDuration(150)
+                .withEndAction(() ->
+                    cardStatus.animate()
+                        .scaleX(1f).scaleY(1f)
+                        .setDuration(150)
+                        .start()
+                ).start();
         }
     }
 
     private File createTempFileFromUri(Uri uri) {
         try {
             InputStream inputStream = getContentResolver().openInputStream(uri);
+            if (inputStream == null) return null;
+            
             File tempFile = new File(getCacheDir(), "upload_" + System.currentTimeMillis() + ".jpg");
             FileOutputStream outputStream = new FileOutputStream(tempFile);
 
@@ -312,5 +435,22 @@ public class DocumentsActivity extends AppCompatActivity implements DocumentAdap
             e.printStackTrace();
             return null;
         }
+    }
+
+    private void animateClick(View v) {
+        if (v == null) return;
+        v.animate()
+            .scaleX(0.95f).scaleY(0.95f)
+            .setDuration(50)
+            .withEndAction(() ->
+                v.animate()
+                    .scaleX(1f).scaleY(1f)
+                    .setDuration(50)
+                    .start()
+            ).start();
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }

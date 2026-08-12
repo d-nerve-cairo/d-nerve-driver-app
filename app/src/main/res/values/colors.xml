@@ -14,6 +14,7 @@
     <!-- Status Colors -->
     <color name="success">#4CAF50</color>
     <color name="warning">#FFC107</color>
+    <color name="warning_light">#FFFFF9</color>
     <color name="error">#F44336</color>
     
     <!-- Neutrals -->
@@ -22,10 +23,12 @@
     <color name="text_primary">#212121</color>
     <color name="text_secondary">#757575</color>
     <color name="text_hint">#9E9E9E</color>
-    <color name="divider">#BDBDBD</color>
+    <color name="divider">#E0E0E0</color>
     <color name="disabled">#9E9E9E</color>
     <color name="white">#FFFFFF</color>
-    
+    <color name="success_light">#E8F5E9</color>
+
+
     <!-- Tier Colors (Gamification) -->
     <color name="tier_bronze">#CD7F32</color>
     <color name="tier_silver">#C0C0C0</color>
@@ -63,4 +66,12 @@
     <!-- Ripple -->
     <color name="ripple_primary">#331E88E5</color>
     <color name="ripple_accent">#33FF9800</color>
+
+    <!-- Cards & Elevated Surfaces -->
+    <color name="surface_elevated">#FFFFFF</color>
+    <color name="card_background">#FFFFFF</color>
+
+
+    <color name="surface_highlight">#FFF8E1</color>
+    <color name="tier_diamond">#B9F2FF</color>
 </resources>
